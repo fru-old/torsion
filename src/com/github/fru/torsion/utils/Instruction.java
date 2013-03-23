@@ -5,8 +5,8 @@ import com.github.fru.torsion.utils.CodeList.Pointer;
 
 public class Instruction {
 	
-	private final Variable out;
-	private final Variable[] ins;
+	private Variable out;
+	private Variable[] ins;
 	private final String operation;
 	
 	private Pointer<Instruction> reference;
@@ -20,12 +20,6 @@ public class Instruction {
 		this.operation = operation;
 		this.ins = ins;
 		this.reference = null;
-		
-		if("goto".equals(operation) && ins != null && ins.length > 1 ){
-			if(ins[1].value instanceof Integer){
-				ins[1].value = (long) ((Integer)ins[1].value);
-			}
-		}
 	}
 	
 	public Instruction(Variable label, String operation, Pointer<Instruction> reference){
@@ -33,6 +27,14 @@ public class Instruction {
 		this.operation = operation;
 		this.ins = null;
 		this.reference = reference;
+	}
+	
+	public void setOutput(Variable out){
+		this.out = out;
+	}
+
+	public void setInput(Variable[] ins){
+		this.ins = ins;
 	}
 	
 	public Variable getOutput(){
@@ -137,6 +139,7 @@ public class Instruction {
 			return VariableType.ANNONYM;
 		}
 		
+		@Override
 		public String toString(){
 			VariableType type = getType();
 			if(this == Variable.END)return "LOCATION end";
@@ -150,12 +153,18 @@ public class Instruction {
 			return (part.length > 1 ? part[1] : value.toString()); 
 		}
 		
+		@Override
 		public boolean equals(Object o){
 			if(!o.getClass().equals(Variable.class))return false;
 			Variable ot = (Variable)o;
 			if(ot.value == null ^ this.value == null)return false;
 			if(this.value != null && !this.value.equals(ot.value) )return false;
 			return true;
+		}
+		
+		@Override
+		public int hashCode(){
+			return this.value == null ? -1 : this.value.hashCode();
 		}
 	}
 }

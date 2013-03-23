@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import com.github.fru.torsion.utils.ByteInputStream;
 import com.github.fru.torsion.utils.CodeList;
@@ -135,7 +136,7 @@ public class JavaClassFile {
 		    int startOffset = byteStream.getByteCount();
 		    try{
 		    	while(true){
-		    		int offset = byteStream.getByteCount() - startOffset + 1;
+		    		long offset = byteStream.getByteCount() - startOffset + 1;
 		    		List<Instruction> c = JavaBytecode.parse(byteStream, offset, constants);
 		    		if(c!=null)code.addAll(c);
 		    	}
@@ -143,6 +144,7 @@ public class JavaClassFile {
 		    	// Expected
 		    }
 		    
+		    JavaNormalization.normalize(code);
 		    methodsInstructions.add(code);
 		    
 		    int tablelength = reader.findShort();
@@ -184,10 +186,29 @@ public class JavaClassFile {
 		for (int i = 0; i < methodsName.length; i++) {
 			out += toStringMethod(i)+"\n";
 			CodeList<Instruction> code = methodsInstructions.get(i);
-			if(code != null)
-			for(Instruction instruction : code){
-				if(instruction != null)out += "\t"+instruction+"\n";
+			if(code != null)out += toStringIndentedCode(code);
+		}
+		return out;
+	}
+	
+	public static String toStringIndentedCode(CodeList<Instruction> operations){
+		String out = "";
+		Stack<Instruction> stack = new Stack<Instruction>();
+		for(Instruction i : operations){
+			String tabs = "";for(int t = 0; t < stack.size(); t++)tabs+="\t";
+			if(i.getOperation().equals("start")){
+				stack.push(i);
+			}else if(i.getOperation().equals("end")){
+				if(tabs.length() > 0){
+					tabs = tabs.substring(1);
+					Instruction p = stack.pop();
+					if(!i.getOutput().equals(p.getOutput())){
+						throw new RuntimeException();
+					}
+					
+				}
 			}
+			out += tabs + i + "\n";
 		}
 		return out;
 	}

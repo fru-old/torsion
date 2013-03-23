@@ -10,7 +10,7 @@ import com.github.fru.torsion.utils.Instruction.Variable;
 
 public class JavaBytecode {
 	
-	public static ArrayList<Instruction> parse(ByteInputStream byteStream, int offset, Map<Integer, JavaConstant> constants) throws EOFException{
+	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, JavaConstant> constants) throws EOFException{
 		int b = byteStream.findNext();
 		ArrayList<Instruction> out = new ArrayList<Instruction>();
 		out.add(new Instruction(null,":",offset));
@@ -21,6 +21,7 @@ public class JavaBytecode {
 		Variable mid;
 		Variable other;
 		int index;
+		long location;
 		
 		switch (b) {
 		case 0x00:
@@ -341,9 +342,9 @@ public class JavaBytecode {
 		case 0x9E:
 			op = new String[]{"==","!=","<",">=",">","<="}[b-0x99];
 			mid = new Variable(); 
-			index = byteStream.getByteCount() + (short)byteStream.findShort();
+			location = byteStream.getByteCount() + (short)byteStream.findShort();
 			out.add(new Instruction(mid,op,Variable.STACK, 0));
-			out.add(new Instruction(null,"goto",mid,index));
+			out.add(new Instruction(null,"goto",mid,location));
 			return out;
 		case 0x9F:
 		case 0xA0:
@@ -353,22 +354,22 @@ public class JavaBytecode {
 		case 0xA4:
 			op = new String[]{"==","!=","<",">=",">","<="}[b-0x9F];
 			mid = new Variable(); 
-			index = byteStream.getByteCount() + (short)byteStream.findShort();
+			location = byteStream.getByteCount() + (short)byteStream.findShort();
 			out.add(new Instruction(mid,op,Variable.STACK,Variable.STACK));
-			out.add(new Instruction(null,"goto",mid,index));
+			out.add(new Instruction(null,"goto",mid,location));
 			return out;
 		case 0xA5:
 		case 0xA6:
 			op = new String[]{"==","!="}[b-0xA5];
 			mid = new Variable();
-			index = byteStream.getByteCount() + (short)byteStream.findShort();
+			location = byteStream.getByteCount() + (short)byteStream.findShort();
 			out.add(new Instruction(mid,op,Variable.STACK,Variable.STACK));
-			out.add(new Instruction(null,"goto",mid,index));
+			out.add(new Instruction(null,"goto",mid,location));
 			return out;
 		case 0xA7:
 			cons = "true";
-			index = byteStream.getByteCount() + (short)byteStream.findShort();
-			out.add(new Instruction(null,"goto",cons,index));
+			location = byteStream.getByteCount() + (short)byteStream.findShort();
+			out.add(new Instruction(null,"goto",cons,location));
 			return out;
 		//TODO 0xA8 0xA9 0xC9 Subroutine
 		//TODO 0xAA 0xAB Table switch
@@ -411,14 +412,14 @@ public class JavaBytecode {
 		case 0xC7:
 			op = new String[]{"==","!="}[b-0xA5];
 			mid = new Variable();
-			index = byteStream.getByteCount() + (short)byteStream.findShort();
+			location = byteStream.getByteCount() + (short)byteStream.findShort();
 			out.add(new Instruction(mid,op,"null",Variable.STACK));
-			out.add(new Instruction(null,"goto",mid,index));
+			out.add(new Instruction(null,"goto",mid,location));
 			return out;
 		case 0xC8:
 			cons = "true";
-			index = byteStream.getByteCount() + byteStream.findInt();
-			out.add(new Instruction(null,"goto",cons,index));
+			location = byteStream.getByteCount() + byteStream.findInt();
+			out.add(new Instruction(null,"goto",cons,location));
 			return out;
 		case 0xCA: 
 			//Breakpoint

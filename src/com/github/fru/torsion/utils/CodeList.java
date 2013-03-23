@@ -106,6 +106,7 @@ public class CodeList<T> extends AbstractList<T>{
 	}
 	
 	public AbstractList<Pointer<T>> getPointer() {
+		final CodeList<T> parent = this; 
 		return new AbstractList<Pointer<T>>(){
 			@Override
 			public Pointer<T> get(int index) {
@@ -115,6 +116,13 @@ public class CodeList<T> extends AbstractList<T>{
 			@Override
 			public int size() {
 				return size;
+			}
+			
+			@Override
+			public Pointer<T> remove(int index){
+				Pointer<T> rem = first.get(index);
+				rem.remove(parent);
+				return rem;
 			}
 		};
 	}
