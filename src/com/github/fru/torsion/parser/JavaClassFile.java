@@ -123,14 +123,25 @@ public class JavaClassFile {
 		}
 	}
 
-	//@SuppressWarnings("unused")
+	@SuppressWarnings("unused")
 	public void parseAttribute(ByteInputStream reader, String name) throws EOFException {
-		/*if("code".equalsIgnoreCase(name)){
+		if("code".equalsIgnoreCase(name)){
 			int maxStack = reader.findShort();
 		    int maxLocal = reader.findShort();
 		    
-		    ByteInputStream codeReader = new ByteInputStream(reader,reader.findInt());
-		    methodsInstructions.add(ParseBytecode.parse(codeReader,constants));
+		    CodeList<Instruction> code = new CodeList<Instruction>();
+		    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
+		    int startOffset = byteStream.getByteCount();
+		    try{
+		    	while(true){
+		    		int offset = byteStream.getByteCount() - startOffset + 1;
+		    		code.addAll(JavaBytecode.parse(byteStream, offset, constants));
+		    	}
+		    }catch(EOFException exception){
+		    	// Expected
+		    }
+		    
+		    methodsInstructions.add(code);
 		    
 		    int tablelength = reader.findShort();
 		    
@@ -144,14 +155,14 @@ public class JavaClassFile {
 		    }
 
 		    findAttributes( reader );
-		}else{*/
+		}else{
 			try {
 				while (true)
 					reader.findNext();
 			} catch (EOFException exception) {
 				// Expected
 			}
-		//}
+		}
 	}
 	
 	public String toString() {

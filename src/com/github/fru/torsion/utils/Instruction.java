@@ -50,7 +50,7 @@ public class Instruction {
 	}
 	
 	public static enum VariableType{
-		LOCAL, STACK, CONSTANT, ANNONYM;
+		LOCAL, STACK, CONSTANT, ANNONYM, RETURN, LOCATION;
 	}
 	
 	@Override
@@ -90,6 +90,8 @@ public class Instruction {
 	public static class Variable{
 		
 		public static final Variable STACK = new Variable();
+		public static final Variable RETURN = new Variable();
+		public static final Variable END = new Variable();
 		
 		private final Object value;
 		
@@ -114,6 +116,8 @@ public class Instruction {
 		}
 		
 		public VariableType getType(){
+			if(value == END)return VariableType.LOCATION;
+			if(value == RETURN)return VariableType.RETURN;
 			if(value == STACK)return VariableType.STACK;
 			if(value instanceof Integer)return VariableType.LOCAL;
 			if(value instanceof String)return VariableType.CONSTANT;
