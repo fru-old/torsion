@@ -414,6 +414,7 @@ public class JavaBytecode {
 			index = byteStream.getByteCount() + (short)byteStream.findShort();
 			out.add(new Instruction(mid,op,"null",Variable.STACK));
 			out.add(new Instruction(null,"goto",mid,index));
+			return out;
 		case 0xC8:
 			cons = "true";
 			index = byteStream.getByteCount() + byteStream.findInt();
@@ -424,7 +425,7 @@ public class JavaBytecode {
 			return out;
 		}
 		//0x58 - 0x5F TODO stack operations
-		
+
 		/*Error Case*/
 		return null;
 	}

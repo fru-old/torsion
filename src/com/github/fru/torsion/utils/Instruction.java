@@ -126,11 +126,15 @@ public class Instruction {
 		
 		public String toString(){
 			VariableType type = getType();
+			if(this == Variable.END)return "LOCATION end";
+			if(this == Variable.RETURN)return "RETURN";
 			if(type == VariableType.STACK)return "STACK";
 			if(type == VariableType.CONSTANT)return "CONST \""+value+"\"";
 			if(type == VariableType.LOCAL)return "LOCAL "+value;
+			//if(type == VariableType.LOCATION)return "LOCATION"
+			if(value == null)return "-";
 			String[] part = value.toString().split("@");
-			return (part.length >= 1 ? part[1] : value.toString()); 
+			return (part.length > 1 ? part[1] : value.toString()); 
 		}
 		
 		public boolean equals(Object o){

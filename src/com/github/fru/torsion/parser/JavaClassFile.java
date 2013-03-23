@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.fru.torsion.utils.ByteInputStream;
@@ -135,7 +136,8 @@ public class JavaClassFile {
 		    try{
 		    	while(true){
 		    		int offset = byteStream.getByteCount() - startOffset + 1;
-		    		code.addAll(JavaBytecode.parse(byteStream, offset, constants));
+		    		List<Instruction> c = JavaBytecode.parse(byteStream, offset, constants);
+		    		if(c!=null)code.addAll(c);
 		    	}
 		    }catch(EOFException exception){
 		    	// Expected
@@ -181,6 +183,11 @@ public class JavaClassFile {
 		}
 		for (int i = 0; i < methodsName.length; i++) {
 			out += toStringMethod(i)+"\n";
+			CodeList<Instruction> code = methodsInstructions.get(i);
+			if(code != null)
+			for(Instruction instruction : code){
+				if(instruction != null)out += "\t"+instruction+"\n";
+			}
 		}
 		return out;
 	}
