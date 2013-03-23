@@ -20,6 +20,12 @@ public class Instruction {
 		this.operation = operation;
 		this.ins = ins;
 		this.reference = null;
+		
+		if("goto".equals(operation) && ins != null && ins.length > 1 ){
+			if(ins[1].value instanceof Integer){
+				ins[1].value = (long) ((Integer)ins[1].value);
+			}
+		}
 	}
 	
 	public Instruction(Variable label, String operation, Pointer<Instruction> reference){
@@ -79,7 +85,13 @@ public class Instruction {
 	
 	public String toString(){
 		String extra = this.operation.equals("goto") && this.reference != null ? " "+this.reference.getData().getOperation() : "";
-		return this.out + " = " + this.operation + extra;
+		String operands = "";
+		for(Variable in : ins){
+			operands += in.toString() +", ";
+		}
+		String out = this.operation + extra+ " "+ operands;
+		if(this.out != null && this.out.value != null)out = this.out + " " + out;
+		return out;
 	}
 	
 	@Override
@@ -93,7 +105,7 @@ public class Instruction {
 		public static final Variable RETURN = new Variable();
 		public static final Variable END = new Variable();
 		
-		private final Object value;
+		private Object value;
 		
 		public Variable(Object value){
 			this.value = value;
@@ -119,6 +131,7 @@ public class Instruction {
 			if(value == END)return VariableType.LOCATION;
 			if(value == RETURN)return VariableType.RETURN;
 			if(value == STACK)return VariableType.STACK;
+			if(value instanceof Long)return VariableType.LOCATION;
 			if(value instanceof Integer)return VariableType.LOCAL;
 			if(value instanceof String)return VariableType.CONSTANT;
 			return VariableType.ANNONYM;
@@ -131,8 +144,8 @@ public class Instruction {
 			if(type == VariableType.STACK)return "STACK";
 			if(type == VariableType.CONSTANT)return "CONST \""+value+"\"";
 			if(type == VariableType.LOCAL)return "LOCAL "+value;
-			//if(type == VariableType.LOCATION)return "LOCATION"
-			if(value == null)return "-";
+			if(type == VariableType.LOCATION)return "LOCATION "+value;
+			if(value == null)return "";
 			String[] part = value.toString().split("@");
 			return (part.length > 1 ? part[1] : value.toString()); 
 		}
