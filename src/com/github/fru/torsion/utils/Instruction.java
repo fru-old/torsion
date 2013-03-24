@@ -46,6 +46,7 @@ public class Instruction {
 	}
 	
 	public Variable[] getInputs(){
+		if(ins==null)return (ins = new Variable[0]);
 		return ins;
 	}
 	
@@ -129,10 +130,15 @@ public class Instruction {
 			return this.value;
 		}
 		
+		//Bugfix: In a perfect world, value should actually never be STACK
+		public boolean isStack(){
+			return value == STACK || this == STACK; 
+		}
+		
 		public VariableType getType(){
 			if(value == END)return VariableType.LOCATION;
 			if(value == RETURN)return VariableType.RETURN;
-			if(value == STACK)return VariableType.STACK;
+			if(isStack())return VariableType.STACK;
 			if(value instanceof Long)return VariableType.LOCATION;
 			if(value instanceof Integer)return VariableType.LOCAL;
 			if(value instanceof String)return VariableType.CONSTANT;

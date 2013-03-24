@@ -4,8 +4,9 @@ public class A {
 	
 	public Object t;
 	
-	public int first(){
-		int x = 0;
+	public int first(int i){
+		A o = this;
+		int x = i;
 		int y = 45;
 		
 		while(true){

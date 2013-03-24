@@ -3,6 +3,7 @@ package com.github.fru.torsion.parser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Stack;
 
 import com.github.fru.torsion.utils.CodeList;
 import com.github.fru.torsion.utils.OrderStructure;
@@ -25,6 +26,7 @@ public class JavaNormalization {
 		
 		JavaNormalization.step2(method);
 		JavaNormalization.step3(method);
+		JavaNormalization.step4(method);
 	}
 	
 	private static void step1(CodeList<Instruction> method){
@@ -108,9 +110,18 @@ public class JavaNormalization {
 				
 				Variable close = iend.getData().getOutput();
 				
+				Variable splitVariable = null;
+				
 				for(Pointer<Instruction> splitStart : splitInteresting){
 					Pointer<Instruction> splitEnd = splitStart.getData().getReference();
 					if(!order.isAfter(lastInteresting, splitEnd)){
+						
+						if(splitVariable == null){
+							splitVariable = new Variable();
+							iend.addAfter(method, new Instruction(splitVariable,"=","true"));
+							igoto.addBefore(method, new Instruction(splitVariable,"=",igoto.getData().getInputs()[0]));
+							igoto.getData().getInputs()[0] = splitVariable;
+						}
 						
 						Pointer<Instruction> newStart = splitStart.addAfter(method, new Instruction(close, "start"));
 						iend.getData().setReference(newStart);
@@ -119,6 +130,7 @@ public class JavaNormalization {
 						
 						
 						Pointer<Instruction> newGoto = newStart.addAfter(method, new Instruction(close, "goto"));
+						newGoto.getData().setInput(new Variable[]{splitVariable});
 						newGoto.getData().setReference(iend);
 						order.addBefore(newStart, newGoto);
 						
@@ -137,4 +149,20 @@ public class JavaNormalization {
 		}
 	}
 	
+	private static void step4(CodeList<Instruction> method){
+		Stack<Variable> stack = new Stack<Variable>();
+		for(Instruction i : method){
+			for(int input = 0; input < i.getInputs().length; input++){
+				if(i.getInputs()[input] != null && i.getInputs()[input].isStack()){
+					if(stack.size() > 0){
+						i.getInputs()[input] = stack.pop();
+					}
+				}
+			}
+			if(i.getOutput() != null && i.getOutput().isStack()){
+				i.setOutput(new Variable());
+				stack.push(i.getOutput());
+			}
+		}
+	}	
 }
