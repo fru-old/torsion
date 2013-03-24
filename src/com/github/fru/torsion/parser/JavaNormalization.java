@@ -116,7 +116,7 @@ public class JavaNormalization {
 					Pointer<Instruction> splitEnd = splitStart.getData().getReference();
 					if(!order.isAfter(lastInteresting, splitEnd)){
 						
-						if(splitVariable == null){
+						if(splitVariable == null && igoto.getData().getInputs().length > 0){
 							splitVariable = new Variable();
 							iend.addAfter(method, new Instruction(splitVariable,"=","true"));
 							igoto.addBefore(method, new Instruction(splitVariable,"=",igoto.getData().getInputs()[0]));

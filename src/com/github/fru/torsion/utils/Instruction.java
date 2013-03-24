@@ -90,7 +90,7 @@ public class Instruction {
 		String extra = this.operation.equals("goto") && this.reference != null ? " "+this.reference.getData().getOperation() : "";
 		String operands = "";
 		for(Variable in : ins){
-			operands += in.toString() +", ";
+			operands += (in == null ? "" : in.toString()) +", ";
 		}
 		String out = this.operation + extra+ " "+ operands;
 		if(this.out != null && this.out.value != null)out = this.out + " " + out;

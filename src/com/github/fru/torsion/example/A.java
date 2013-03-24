@@ -31,12 +31,12 @@ public class A {
 	public static void second(long i){
 		//System.out.println("test");
 		//Math.abs(345);
-		/*
+		
 		while(i > 45)
 		if(56>i){
 			int j = 0;
 			i = j;
-		}*/
+		}
 		
 	}
 	
