@@ -4,49 +4,41 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import com.github.fru.torsion.lib.client.JQuerySelector;
+import com.github.fru.torsion.lib.client.JQuery;
 import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class Rebuild {
+	
+	static JQuery jQuery = getHtmlDocument();
 
-	public static void main(String[] args) throws IOException {
-		
-		
-		Document doc = new DocumentImpl();
-		Element root = doc.createElement("html");
-		Element body = doc.createElement("body");
-		doc.appendChild(root);
-		root.appendChild(body);
-		body.setAttribute("id", "b");
-		
-		body.appendChild(doc.createTextNode("test test"));
-		
-		ArrayList<Node> list = new JQuerySelector().get(doc,"test");
-		System.out.println(list.size());
-		for(Node n : list){
-			Node id = n.getAttributes() != null ? n.getAttributes().getNamedItem("id") : null;
-			System.out.println("\t"+n.getNodeName()+(id == null ? "" : ("#"+id.getNodeValue())));
+	public static void main(String[] args) throws Exception {	
+		jQuery.get("body").attr("id", "body");
+		for(int i = 0; i < 5; i++){
+			jQuery.get("body").append("<div id='"+i+"' />");
 		}
 		
-		OutputFormat format = new OutputFormat(doc);
-        format.setLineWidth(65);
-        format.setIndenting(true);
-        format.setIndent(2);
-        Writer out = new StringWriter();
-        XMLSerializer serializer = new XMLSerializer(out, format);
-        serializer.serialize(doc);
+		jQuery.get("div").after("<test/>");
+		jQuery.get("body").before("test");
+		jQuery.get("body").append(jQuery.create("test#tes.te.t.e[tz=tz][z=z]"));
+		
+		System.out.println(jQuery.get("test").toString());
+        System.out.println(jQuery.toString());
+	}
 
-        //System.out.println(out.toString());
+	public static JQuery getHtmlDocument(){
+		JQuery jQuery = new JQuery(new DocumentImpl());
+		Document doc = jQuery.getDocument();
+		Element root = doc.createElement("html");
+		Element head = doc.createElement("head");
+		Element body = doc.createElement("body");
+		doc.appendChild(root);
+		root.appendChild(head);
+		root.appendChild(body);
+		return jQuery;
 	}
 	
 	public static PrintWriter write(String name) throws IOException{

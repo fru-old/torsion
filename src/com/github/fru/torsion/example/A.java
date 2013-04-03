@@ -5,6 +5,7 @@ public class A {
 	public Object t;
 	
 	public int first(int i){
+		@SuppressWarnings("unused")
 		A o = this;
 		int x = i;
 		int y = 45;
