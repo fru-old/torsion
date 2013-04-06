@@ -1,11 +1,11 @@
-package com.github.fru.torsion.parser;
+package com.github.fru.torsion.bytecode;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.github.fru.torsion.utils.ByteInputStream;
+import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 
-public class JavaConstant {
+public class ClassFileConstant {
 
 	public static enum Type {
 		String, Class, NameAndType, MethodRef, FieldRef, InterfaceMethodRef, Integer, Float, Long, Double, Utf8;
@@ -19,15 +19,15 @@ public class JavaConstant {
 
 	private Type type;
 
-	private JavaConstant(String value) {
+	private ClassFileConstant(String value) {
 		this.value = value;
 	}
 
-	private JavaConstant(int ref1) {
+	private ClassFileConstant(int ref1) {
 		this.ref1 = ref1;
 	}
 
-	private JavaConstant(int ref1, int ref2) {
+	private ClassFileConstant(int ref1, int ref2) {
 		this.ref1 = ref1;
 		this.ref2 = ref2;
 	}
@@ -54,65 +54,65 @@ public class JavaConstant {
 		return out;
 	}
 
-	public static JavaConstant parse(ByteInputStream reader)
+	public static ClassFileConstant parse(ByteInputStream reader)
 			throws IOException {
 		int byteType = reader.findNext();
-		JavaConstant.Type type = null;
-		JavaConstant constant = null;
+		ClassFileConstant.Type type = null;
+		ClassFileConstant constant = null;
 		switch (byteType) {
 		case 1: // UTF-8
-			type = JavaConstant.Type.Utf8;
+			type = ClassFileConstant.Type.Utf8;
 			byte[] bytes = new byte[reader.findShort()];
 			for (int i = 0; i < bytes.length; i++) {
 				bytes[i] = (byte) reader.findNext();
 			}
 			try {
-				constant = new JavaConstant(new String(bytes, "UTF-8"));
+				constant = new ClassFileConstant(new String(bytes, "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 			break;
 		case 3: // Integer
-			type = JavaConstant.Type.Integer;
-			constant = new JavaConstant("" + reader.findInt());
+			type = ClassFileConstant.Type.Integer;
+			constant = new ClassFileConstant("" + reader.findInt());
 			break;
 		case 4: // Float
-			type = JavaConstant.Type.Float;
-			constant = new JavaConstant(""
+			type = ClassFileConstant.Type.Float;
+			constant = new ClassFileConstant(""
 					+ Float.intBitsToFloat(reader.findInt()));
 			break;
 		case 5: // Long
-			type = JavaConstant.Type.Long;
-			constant = new JavaConstant("" + reader.findLong());
+			type = ClassFileConstant.Type.Long;
+			constant = new ClassFileConstant("" + reader.findLong());
 			break;
 		case 6: // Double
-			type = JavaConstant.Type.Double;
-			constant = new JavaConstant(""
+			type = ClassFileConstant.Type.Double;
+			constant = new ClassFileConstant(""
 					+ Double.longBitsToDouble(reader.findLong()));
 			break;
 		case 9: // FieldRef
-			type = JavaConstant.Type.FieldRef;
-			constant = new JavaConstant(reader.findShort(), reader.findShort());
+			type = ClassFileConstant.Type.FieldRef;
+			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 10: // MethodRef
-			type = JavaConstant.Type.MethodRef;
-			constant = new JavaConstant(reader.findShort(), reader.findShort());
+			type = ClassFileConstant.Type.MethodRef;
+			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 11: // InterfaceMethodRef
-			type = JavaConstant.Type.InterfaceMethodRef;
-			constant = new JavaConstant(reader.findShort(), reader.findShort());
+			type = ClassFileConstant.Type.InterfaceMethodRef;
+			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 12: // NameAndType
-			type = JavaConstant.Type.NameAndType;
-			constant = new JavaConstant(reader.findShort(), reader.findShort());
+			type = ClassFileConstant.Type.NameAndType;
+			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 7: // Class
-			type = JavaConstant.Type.Class;
-			constant = new JavaConstant(reader.findShort());
+			type = ClassFileConstant.Type.Class;
+			constant = new ClassFileConstant(reader.findShort());
 			break;
 		case 8: // String
-			type = JavaConstant.Type.String;
-			constant = new JavaConstant(reader.findShort());
+			type = ClassFileConstant.Type.String;
+			constant = new ClassFileConstant(reader.findShort());
 			break;
 		default:
 			String message = "Found ["

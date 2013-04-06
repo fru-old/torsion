@@ -1,6 +1,6 @@
-package com.github.fru.torsion.utils;
+package com.github.fru.torsion.bytecode.utils;
 
-import com.github.fru.torsion.utils.CodeList.Pointer;
+import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
 
 
 public class Instruction {

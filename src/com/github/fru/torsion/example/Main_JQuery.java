@@ -1,4 +1,4 @@
-package com.github.fru.torsion.webapp;
+package com.github.fru.torsion.example;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,16 +8,18 @@ import java.io.PrintWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.github.fru.torsion.lib.client.JQuery;
+import com.github.fru.torsion.jquery.JQuery;
 import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
 
-public class Rebuild {
+public class Main_JQuery {
 	
 	static JQuery jQuery = getHtmlDocument();
 
 	public static void main(String[] args) throws Exception {	
 		jQuery.get("body").attr("id", "body");
-		for(int i = 0; i < 5; i++){
+		
+		int count = 5;
+		for(int i = 0; i < count; i++){
 			jQuery.get("body").append("<div id='"+i+"' />");
 		}
 		
@@ -28,10 +30,10 @@ public class Rebuild {
 		System.out.println(jQuery.get("test").toString());
 		
 		System.out.println(jQuery.get("test#tes.te.t.e[tz=tz][z=z],div").toString());
-		//System.out.println(CssUtilities.get(CssUtilities.parseSelector("test#tes.te.t.e[tz=tz][z=z]"), jQuery.getDocument()));
 		
+		System.out.println(jQuery.get("div+test+div").toString());
 		
-        System.out.println(jQuery.toString());
+        System.out.println(jQuery.toHtml());
 	}
 
 	public static JQuery getHtmlDocument(){
@@ -49,7 +51,7 @@ public class Rebuild {
 	public static PrintWriter write(String name) throws IOException{
 		String path = new File(".").getCanonicalPath();
 		path += "\\src\\";
-		path += Rebuild.class.getPackage().getName().replace('.', '\\');
+		path += Main_JQuery.class.getPackage().getName().replace('.', '\\');
 		
 		File file = new File(path +"\\"+ name);
 		if(!file.exists()){

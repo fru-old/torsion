@@ -1,4 +1,4 @@
-package com.github.fru.torsion.parser;
+package com.github.fru.torsion.bytecode;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.github.fru.torsion.utils.ByteInputStream;
-import com.github.fru.torsion.utils.CodeList;
-import com.github.fru.torsion.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.ByteInputStream;
+import com.github.fru.torsion.bytecode.utils.CodeList;
+import com.github.fru.torsion.bytecode.utils.Instruction;
 
-public class JavaClassFile {
+public class ClassFile {
 
-	public static JavaClassFile parse(String name) throws IOException {
-		return new JavaClassFile(new ByteInputStream(Thread.currentThread().getContextClassLoader()
+	public static ClassFile parse(String name) throws IOException {
+		return new ClassFile(new ByteInputStream(Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(name.replace('.', '/') + ".class")));
 	}
 
-	public static JavaClassFile parse(java.lang.Class<?> c) throws IOException {
-		return JavaClassFile.parse(c.getName());
+	public static ClassFile parse(java.lang.Class<?> c) throws IOException {
+		return ClassFile.parse(c.getName());
 	}
 	
-	private JavaClassFile(ByteInputStream reader) throws IOException {
+	private ClassFile(ByteInputStream reader) throws IOException {
 		// PARSE: Magic number
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };
 
@@ -40,13 +40,13 @@ public class JavaClassFile {
 
 		// PARSE: Constant table
 		int constantPoolCount = reader.findShort();
-		this.constants = new HashMap<Integer, JavaConstant>();
+		this.constants = new HashMap<Integer, ClassFileConstant>();
 
 		for (int c = 1; c < constantPoolCount; c++) {
-			JavaConstant constant = JavaConstant.parse(reader);
+			ClassFileConstant constant = ClassFileConstant.parse(reader);
 			constants.put(c, constant);
-			if (constant.getType() == JavaConstant.Type.Long
-					|| constant.getType() == JavaConstant.Type.Double) {
+			if (constant.getType() == ClassFileConstant.Type.Long
+					|| constant.getType() == ClassFileConstant.Type.Double) {
 				c++; // ick
 			}
 		}
@@ -95,7 +95,7 @@ public class JavaClassFile {
 		}
 	}
 
-	Map<Integer, JavaConstant> constants;
+	Map<Integer, ClassFileConstant> constants;
 
 	int minorVersion;
 	int majorVersion;
@@ -137,14 +137,14 @@ public class JavaClassFile {
 		    try{
 		    	while(true){
 		    		long offset = byteStream.getByteCount() - startOffset + 1;
-		    		List<Instruction> c = JavaBytecode.parse(byteStream, offset, constants);
+		    		List<Instruction> c = Bytecode.parse(byteStream, offset, constants);
 		    		if(c!=null)code.addAll(c);
 		    	}
 		    }catch(EOFException exception){
 		    	// Expected
 		    }
 		    
-		    JavaNormalization.normalize(code);
+		    BytecodeNormalization.normalize(code);
 		    methodsInstructions.add(code);
 		    
 		    int tablelength = reader.findShort();

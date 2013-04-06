@@ -1,16 +1,16 @@
-package com.github.fru.torsion.parser;
+package com.github.fru.torsion.bytecode;
 
 import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.github.fru.torsion.utils.ByteInputStream;
-import com.github.fru.torsion.utils.Instruction;
-import com.github.fru.torsion.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.ByteInputStream;
+import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 
-public class JavaBytecode {
+public class Bytecode {
 	
-	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, JavaConstant> constants) throws EOFException{
+	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants) throws EOFException{
 		int b = byteStream.findNext();
 		ArrayList<Instruction> out = new ArrayList<Instruction>();
 		out.add(new Instruction(null,":",offset));

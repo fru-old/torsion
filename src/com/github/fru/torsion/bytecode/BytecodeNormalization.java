@@ -1,21 +1,21 @@
-package com.github.fru.torsion.parser;
+package com.github.fru.torsion.bytecode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
 
-import com.github.fru.torsion.utils.CodeList;
-import com.github.fru.torsion.utils.OrderStructure;
-import com.github.fru.torsion.utils.CodeList.Pointer;
-import com.github.fru.torsion.utils.Instruction;
-import com.github.fru.torsion.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.CodeList;
+import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.OrderStructure;
+import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
+import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 
-public class JavaNormalization {
+public class BytecodeNormalization {
 
 	public static void normalize(CodeList<Instruction> method){
 		//Add start and end instructions for goto's
-		JavaNormalization.step1(method);
+		BytecodeNormalization.step1(method);
 		//Remove unnesecarry labels
 		for(Iterator<Pointer<Instruction>> i = method.getPointer().iterator(); i.hasNext();){
 			Pointer<Instruction> current = i.next();
@@ -24,9 +24,9 @@ public class JavaNormalization {
 			}
 		}
 		
-		JavaNormalization.step2(method);
-		JavaNormalization.step3(method);
-		JavaNormalization.step4(method);
+		BytecodeNormalization.step2(method);
+		BytecodeNormalization.step3(method);
+		BytecodeNormalization.step4(method);
 	}
 	
 	private static void step1(CodeList<Instruction> method){

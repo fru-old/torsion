@@ -1,4 +1,4 @@
-package com.github.fru.torsion.utils;
+package com.github.fru.torsion.bytecode.utils;
 
 import java.io.EOFException;
 import java.io.IOException;
