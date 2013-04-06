@@ -28,7 +28,7 @@ public class JQueryCollection{
 	}
 	
 	public JQueryCollection add(String content){
-		this.collection.addAll(AbstractSelector.get(CssToken.parseSelector(content), jQuery.getDocument()));
+		this.collection.addAll(AbstractSelector.filter(CssToken.parseSelector(content), TraversalUtilities.getAll(jQuery.getDocument())));
 		return this;
 	}
 	

@@ -4,11 +4,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.github.fru.torsion.jquery.CssToken;
-import com.github.fru.torsion.jquery.TraversalUtilities;
 
 public abstract class AbstractSelector{
 	
@@ -29,6 +27,14 @@ public abstract class AbstractSelector{
 	/*private static AbstractSelector getAllSelector(){
 		return new BasicSelector(new CssToken('t', "*"));
 	}*/
+	
+	public static HashSet<Node> filter(List<CssToken> selectors, LinkedHashSet<Node> roots){
+		return filter(roots, roots, selectors);
+	}
+	
+	public static void make(CssToken current, CssToken next, Node out){
+		build(current, next).make(out);
+	}
 	
 	private static AbstractSelector build(CssToken current, CssToken next){
 		if(current.type == '#' || current.type == '.' || current.type == 't'  || current.type == '['){
@@ -57,14 +63,5 @@ public abstract class AbstractSelector{
 			if(selector != null)out = filter(original, selector.match(out), list);
 		}
 		return out;
-	}
-	
-	public static HashSet<Node> get(List<CssToken> list, Document doc){
-		LinkedHashSet<Node> original = TraversalUtilities.getAll(doc);
-		return filter(original, original, list);
-	}
-	
-	public static void make(CssToken current, CssToken next, Node out){
-		build(current, next).make(out);
 	}
 }
