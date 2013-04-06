@@ -22,7 +22,7 @@ public class ClassFile {
 	public static ClassFile parse(java.lang.Class<?> c) throws IOException {
 		return ClassFile.parse(c.getName());
 	}
-	
+
 	private ClassFile(ByteInputStream reader) throws IOException {
 		// PARSE: Magic number
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };

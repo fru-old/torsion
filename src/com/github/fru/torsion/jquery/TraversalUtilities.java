@@ -37,12 +37,12 @@ public class TraversalUtilities {
 		}
 		return out;
 	}
-	
+
 	private static LinkedHashSet<Node> appendElementChildreen(Node node, boolean deep, LinkedHashSet<Node> out) {
 		NodeList list = node.getChildNodes();
 		if (list != null) for (int i = 0; i < list.getLength(); i++) {
 			Node child = list.item(i);
-			if (child.getNodeType() == Node.ELEMENT_NODE){
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				out.add(child);
 				if (deep) appendElementChildreen(child, deep, out);
 			}
@@ -53,9 +53,9 @@ public class TraversalUtilities {
 	public static LinkedHashSet<Node> getNext(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
-			if (node.getNextSibling() != null){
+			if (node.getNextSibling() != null) {
 				node = node.getNextSibling();
-				if(node.getNodeType() == Node.ELEMENT_NODE)out.add(node);
+				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
 		return out;
@@ -66,7 +66,7 @@ public class TraversalUtilities {
 		for (Node node : current) {
 			while (node.getNextSibling() != null) {
 				node = node.getNextSibling();
-				if(node.getNodeType() == Node.ELEMENT_NODE)out.add(node);
+				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
 		return out;
@@ -75,9 +75,9 @@ public class TraversalUtilities {
 	public static LinkedHashSet<Node> getPrev(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
-			if (node.getPreviousSibling() != null){
+			if (node.getPreviousSibling() != null) {
 				node = node.getPreviousSibling();
-				if(node.getNodeType() == Node.ELEMENT_NODE)out.add(node);
+				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
 		return out;
@@ -88,7 +88,7 @@ public class TraversalUtilities {
 		for (Node node : current) {
 			while (node.getPreviousSibling() != null) {
 				node = node.getPreviousSibling();
-				if(node.getNodeType() == Node.ELEMENT_NODE)out.add(node);
+				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
 		return out;
@@ -104,6 +104,5 @@ public class TraversalUtilities {
 		}
 		return out;
 	}
-	
-	
+
 }

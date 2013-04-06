@@ -4,38 +4,38 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class OrderStructure<T> {
-	
+
 	public final ArrayList<T> linearDS = new ArrayList<T>();
-	
-	public Iterable<T> inbetween(final T before, final T after){
+
+	public Iterable<T> inbetween(final T before, final T after) {
 		return new Iterable<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				
+
 				return inbetween(linearDS.indexOf(before), linearDS.indexOf(after));
 			}
 		};
 	}
-	
-	public boolean isAfter(T current, T after){
+
+	public boolean isAfter(T current, T after) {
 		return linearDS.indexOf(current) < linearDS.indexOf(after);
 	}
-	
-	public void add(T newest){
+
+	public void add(T newest) {
 		linearDS.add(newest);
 	}
-	
-	public void addAfter(T current, T after){
+
+	public void addAfter(T current, T after) {
 		int i = linearDS.indexOf(current);
 		linearDS.add(i, after);
 	}
-	
-	public void addBefore(T current, T before){
+
+	public void addBefore(T current, T before) {
 		int i = linearDS.indexOf(current);
-		linearDS.add(i+1, before);
+		linearDS.add(i + 1, before);
 	}
 
-	private Iterator<T> inbetween(final int beforeIndex, final int afterIndex){
+	private Iterator<T> inbetween(final int beforeIndex, final int afterIndex) {
 		return new Iterator<T>() {
 			int nextIndex = beforeIndex + 1;
 

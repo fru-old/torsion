@@ -7,11 +7,11 @@ import java.io.InputStream;
 public class ByteInputStream {
 
 	private InputStream input;
-	
-	public InputStream getInput(){
+
+	public InputStream getInput() {
 		return input;
 	}
-	
+
 	private Position position;
 
 	public ByteInputStream(InputStream input) {
@@ -27,8 +27,7 @@ public class ByteInputStream {
 	}
 
 	public int findNext() throws EOFException {
-		if (maxReads == 0)
-			throw new EOFException();
+		if (maxReads == 0) throw new EOFException();
 		maxReads--;
 		int out = -1;
 		try {
@@ -44,8 +43,7 @@ public class ByteInputStream {
 	}
 
 	public int findInt() throws EOFException {
-		return (findNext() << 24) + ((findNext() & 0xFF) << 16)
-				+ ((findNext() & 0xFF) << 8) + (findNext() & 0xFF);
+		return (findNext() << 24) + ((findNext() & 0xFF) << 16) + ((findNext() & 0xFF) << 8) + (findNext() & 0xFF);
 	}
 
 	public int findShort() throws EOFException {
@@ -59,23 +57,25 @@ public class ByteInputStream {
 	public Position getPosition() {
 		return position;
 	}
-	
-	public class Position{
+
+	public class Position {
 		private int lineCount = 0;
 		private int lineByte = -1;
 		private int byteCount = 0;
-		
+
 		public int getLineCount() {
 			return lineCount;
 		}
+
 		public int getLineByte() {
 			return lineByte;
 		}
+
 		public int getByteCount() {
 			return byteCount;
 		}
-		
-		public void move(boolean isNewLine){
+
+		public void move(boolean isNewLine) {
 			lineByte++;
 			byteCount++;
 			if (isNewLine) {
@@ -83,10 +83,10 @@ public class ByteInputStream {
 				lineByte = 0;
 			}
 		}
-		
+
 		@Override
-		public String toString(){
-			return "line "+lineCount+" @ "+lineByte;
+		public String toString() {
+			return "line " + lineCount + " @ " + lineByte;
 		}
 	}
 

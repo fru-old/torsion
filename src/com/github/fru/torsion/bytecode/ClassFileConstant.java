@@ -42,8 +42,7 @@ public class ClassFileConstant {
 
 	public String toString() {
 		String out = "";
-		if (type != null)
-			out += type + ": ";
+		if (type != null) out += type + ": ";
 		if (value != null) {
 			out += value;
 		} else if (ref2 != -1) {
@@ -54,8 +53,7 @@ public class ClassFileConstant {
 		return out;
 	}
 
-	public static ClassFileConstant parse(ByteInputStream reader)
-			throws IOException {
+	public static ClassFileConstant parse(ByteInputStream reader) throws IOException {
 		int byteType = reader.findNext();
 		ClassFileConstant.Type type = null;
 		ClassFileConstant constant = null;
@@ -78,8 +76,7 @@ public class ClassFileConstant {
 			break;
 		case 4: // Float
 			type = ClassFileConstant.Type.Float;
-			constant = new ClassFileConstant(""
-					+ Float.intBitsToFloat(reader.findInt()));
+			constant = new ClassFileConstant("" + Float.intBitsToFloat(reader.findInt()));
 			break;
 		case 5: // Long
 			type = ClassFileConstant.Type.Long;
@@ -87,8 +84,7 @@ public class ClassFileConstant {
 			break;
 		case 6: // Double
 			type = ClassFileConstant.Type.Double;
-			constant = new ClassFileConstant(""
-					+ Double.longBitsToDouble(reader.findLong()));
+			constant = new ClassFileConstant("" + Double.longBitsToDouble(reader.findLong()));
 			break;
 		case 9: // FieldRef
 			type = ClassFileConstant.Type.FieldRef;
@@ -115,9 +111,7 @@ public class ClassFileConstant {
 			constant = new ClassFileConstant(reader.findShort());
 			break;
 		default:
-			String message = "Found ["
-					+ byteType
-					+ "] but expected any of [01,03,04,05,06,07,08,09,0A,0B,0C] at Position "
+			String message = "Found [" + byteType + "] but expected any of [01,03,04,05,06,07,08,09,0A,0B,0C] at Position "
 					+ reader.getPosition();
 			throw new IOException(message);
 		}
