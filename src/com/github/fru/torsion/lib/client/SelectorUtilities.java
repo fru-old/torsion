@@ -1,6 +1,5 @@
 package com.github.fru.torsion.lib.client;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import org.w3c.dom.Node;
@@ -10,14 +9,15 @@ import com.github.fru.torsion.lib.client.CssUtilities.CssToken;
 public class SelectorUtilities {
 
 	public interface Selector{
-		public HashSet<Node> match(Iterable<Node> nodes);
+		public LinkedHashSet<Node> match(Iterable<Node> nodes);
+		public void make(Node node);
 	}
 	
 	public static abstract class DefaultSelector implements Selector{
 		
 		@Override
-		public HashSet<Node> match(Iterable<Node> nodes) {
-			HashSet<Node> out = new LinkedHashSet<Node>();
+		public LinkedHashSet<Node> match(Iterable<Node> nodes) {
+			LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 			for(Node node : nodes)if(match(node))out.add(node);
 			return out;
 		}
@@ -34,6 +34,7 @@ public class SelectorUtilities {
 		
 		@Override
 		protected boolean match(Node node){
+			if(token == null)return false;
 			if(token.type == 't'){
 				return "*".equals(token.content) || node.getNodeName().equals(token.content);
 			}else if(token.type == '#'){
@@ -42,6 +43,15 @@ public class SelectorUtilities {
 				return CssUtilities.parseClasses(NodeUtilities.getAttribute(node, "class")).contains(token.content);
 			}else{
 				return false;
+			}
+		}
+
+		@Override
+		public void make(Node node) {
+			if(token.type == '#'){
+				NodeUtilities.setAttribute(node, "id", token.content);
+			}else if(token.type == '.'){
+				CssUtilities.addClasses(node, token.content);
 			}
 		}
 	}
@@ -70,6 +80,8 @@ public class SelectorUtilities {
 				sign = key.charAt(key.length()-1);
 				if(sign == '|' || sign == '*' || sign == '~' || sign == '$' || sign == '!' || sign == '^'){
 					key = key.substring(0, key.length()-1);
+				}else{
+					sign = 0;
 				}
 			}
 		}
@@ -90,6 +102,12 @@ public class SelectorUtilities {
 			else if(sign == '!')return !attribute.equals(value);
 			else return attribute.equals(value);
 		}
+
+		@Override
+		public void make(Node node) {
+			if(key == null || sign != 0)return;
+			NodeUtilities.setAttribute(node, key, value!=null?value:"");
+		}
 	}
 	
 	public static class HirarchySelector implements Selector{
@@ -100,8 +118,8 @@ public class SelectorUtilities {
 		}
 
 		@Override
-		public HashSet<Node> match(Iterable<Node> nodes) {
-			HashSet<Node> out = new LinkedHashSet<Node>();
+		public LinkedHashSet<Node> match(Iterable<Node> nodes) {
+			LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 			if(token.type == '>'){
 				for(Node node : nodes)NodeUtilities.appendTagChildreen(node, false, out);
 			}else if(token.type == 'd'){
@@ -120,6 +138,9 @@ public class SelectorUtilities {
 			}
 			return out;
 		}
+
+		@Override
+		public void make(Node node) {}
 	}
 	
 	@SuppressWarnings("unused")
@@ -133,10 +154,13 @@ public class SelectorUtilities {
 		}
 
 		@Override
-		public HashSet<Node> match(Iterable<Node> nodes) {
+		public LinkedHashSet<Node> match(Iterable<Node> nodes) {
 			//TODO: implement custom selector
-			return new HashSet<Node>();
+			return new LinkedHashSet<Node>();
 		}
+
+		@Override
+		public void make(Node node) {}
 	}
 	
 	

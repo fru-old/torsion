@@ -12,6 +12,8 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.github.fru.torsion.lib.client.SelectorUtilities.Selector;
+
 public class CssUtilities {
 
 	public static HashSet<String> parseClasses(String classes){
@@ -27,6 +29,13 @@ public class CssUtilities {
 		String out = "";
 		for(String s : classes)out += ","+s;
 		return out.length() > 0 ? out.substring(1) : out;
+	}
+	
+	public static void addClasses(Node node, String classes){
+		HashSet<String> before = parseClasses(NodeUtilities.getAttribute(node, "class"));
+		HashSet<String> after = parseClasses(classes);
+		after.addAll(before);
+		NodeUtilities.setAttribute(node, "class", toString(after));
 	}
 	
 	public static class CssToken{
@@ -115,35 +124,51 @@ public class CssUtilities {
 		return !isHierarchy(c) && foundSpaces;
 	}
 	
-	public static HashSet<Node> filter(HashSet<Node> matched, List<CssToken> list){
-		HashSet<Node> original = matched;
-		matched = new LinkedHashSet<Node>(matched); 
-		if(list.size() == 0)return new LinkedHashSet<Node>();
-		while(list.size() > 0){
-			CssToken current = list.get(0);
-			list = list.subList(1, list.size());
-			if(current.type == '#' || current.type == '.' || current.type == 't'){
-				matched = new SelectorUtilities.BasicSelector(current).match(matched);
-			}else if(current.type == ':'){
-				boolean next = list.size() > 0 && list.get(0).type == '(';
-				matched = new SelectorUtilities.CustomSelector(current, next ? list.get(0) : null).match(matched);
-				if(next)list = list.subList(1, list.size());
-			}else if(current.type == '['){
-				matched = new SelectorUtilities.AttributeSelector(current).match(matched);
-			}else if(current.type == ','){
-				matched.addAll(filter(original, list));
-				return matched;
-			}else if(current.type == 'd' || current.type == '>' || current.type == '+' || current.type == '~'){
-				matched = new SelectorUtilities.HirarchySelector(current).match(matched);
-			}else{
-				return new LinkedHashSet<Node>();
-			}
+	public static LinkedHashSet<Node> filter(LinkedHashSet<Node> original, LinkedHashSet<Node> out, List<CssToken> list){
+		if(list.size() == 0)return out;
+		
+		CssToken current = list.get(0);
+		CssToken next = list.size()>1 ? list.get(1) : null;
+		list = list.subList(1, list.size());
+	
+		if(current.type == ','){
+			out = new LinkedHashSet<Node>(out);
+			out.addAll(filter(original, original, list));
+		}else{
+			Selector selector = getSelectors(current, next);
+			if(selector != null)out = filter(original, selector.match(out), list);
 		}
-		return matched;
+		return out;
+	}
+	
+	public static Selector getSelectors(CssToken current, CssToken next){
+		if(current.type == '#' || current.type == '.' || current.type == 't'){
+			return new SelectorUtilities.BasicSelector(current);
+		}else if(current.type == ':'){
+			return new SelectorUtilities.CustomSelector(current, next);
+		}else if(current.type == '['){
+			return new SelectorUtilities.AttributeSelector(current);
+		}else if(current.type == 'd' || current.type == '>' || current.type == '+' || current.type == '~'){
+			return new SelectorUtilities.HirarchySelector(current);
+		}else{
+			return null;
+		}
 	}
 	
 	public static HashSet<Node> get(List<CssToken> list, Document doc){
-		return filter(NodeUtilities.appendTagChildreen(doc, true, new LinkedHashSet<Node>()), list);
+		LinkedHashSet<Node> original = NodeUtilities.appendTagChildreen(doc, true, new LinkedHashSet<Node>());
+		return filter(original, original, list);
+	}
+	
+	public static Node create(List<CssToken> list, Document doc){
+		String tag = "div";
+		for(CssToken t : list)if(t.type == 't')tag = t.content;
+		Node out = doc.createElement(tag);
+		while(list.size() > 0){
+			getSelectors(list.get(0), list.size()>1 ? list.get(1) : null).make(out);
+			list = list.subList(1, list.size());
+		}
+		return out;
 	}
 	
 	public static void main(String[] args){

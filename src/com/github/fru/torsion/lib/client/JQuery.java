@@ -1,7 +1,7 @@
 package com.github.fru.torsion.lib.client;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -23,43 +23,39 @@ public class JQuery {
 	}
 	
 	public JQueryCollection get(JQueryCollection collection){
-		JQueryCollection jQuery = new JQueryCollection();
-		jQuery.collection = new HashSet<Node>();
-		jQuery.collection.addAll(collection.collection);
-		return jQuery;
+		return new JQueryCollection().add(collection);
 	}
 	
 	public JQueryCollection create(String content){
 		JQueryCollection out = new JQueryCollection();
-		out.collection = new HashSet<Node>();
-		out.collection.add(DomUtilities.createNodeFromSelector(getDocument(), content));
+		out.collection.add(CssUtilities.create(CssUtilities.parseSelector(content), getDocument()));
 		return out;
 	}
 	
 	@Override
 	public String toString(){
 		try {
-			return DomUtilities.toString(getDocument());
+			return SerializationUtilities.toString(getDocument());
 		} catch (IOException e) {
 			return "";
 		}
 	}
 	
 	public class JQueryCollection{
-		HashSet<Node> collection = new HashSet<Node>();
+		LinkedHashSet<Node> collection = new LinkedHashSet<Node>();
 		
 		@Override
 		public String toString(){
 			String out = "";
 			for(Node n : collection){
-				String id = DomUtilities.getAttribute(n, "id");
+				String id = NodeUtilities.getAttribute(n, "id");
 				out += n.getNodeName()+(id == null ? "" : "#"+id)+",";
 			}
 			return out.substring(0, out.length()-1);
 		}
 		
 		public JQueryCollection add(String content){
-			this.collection.addAll(DomUtilities.get(getDocument(), content));
+			this.collection.addAll(CssUtilities.get(CssUtilities.parseSelector(content), getDocument()));
 			return this;
 		}
 		
@@ -69,28 +65,28 @@ public class JQuery {
 		}
 	
 		public JQueryCollection addClass(String string){
-			DomUtilities.addClasses(collection, string);
+			for(Node node : collection)CssUtilities.addClasses(node, string);
 			return this;
 		}
 		
 		//Add nodes as siblings
 		public JQueryCollection after(String content){
-			DomUtilities.after(collection, DomUtilities.createNodes(getDocument(), content));
+			InsertionUtilities.after(collection, SerializationUtilities.createNodes(getDocument(), content));
 			return this;
 		}
 		
 		public JQueryCollection after(JQueryCollection content){
-			DomUtilities.after(collection, content.collection);
+			InsertionUtilities.after(collection, content.collection);
 			return this;
 		}
 		
 		public JQueryCollection before(String content){
-			DomUtilities.before(collection, DomUtilities.createNodes(getDocument(), content));
+			InsertionUtilities.before(collection, SerializationUtilities.createNodes(getDocument(), content));
 			return this;
 		}
 		
 		public JQueryCollection before(JQueryCollection content){
-			DomUtilities.before(collection, content.collection);
+			InsertionUtilities.before(collection, content.collection);
 			return this;
 		}
 		
@@ -101,7 +97,7 @@ public class JQuery {
 		
 		//Attribute
 		public JQueryCollection attr(String key, String value){
-			for(Node t: this.collection)DomUtilities.setAttribute(t, key, value);
+			for(Node t: this.collection)NodeUtilities.setAttribute(t, key, value);
 			return this;
 		}
 		
@@ -113,7 +109,7 @@ public class JQuery {
 		}
 		
 		public JQueryCollection append(String content){
-			for(Node t: this.collection)for(Node n: DomUtilities.createNodes(getDocument(), content))t.appendChild(n);
+			for(Node t: this.collection)for(Node n: SerializationUtilities.createNodes(getDocument(), content))t.appendChild(n);
 			return this;
 		}
 	}

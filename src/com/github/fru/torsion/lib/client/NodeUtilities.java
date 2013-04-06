@@ -1,6 +1,6 @@
 package com.github.fru.torsion.lib.client;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,7 +23,7 @@ public class NodeUtilities {
 		return ((Element)node).getAttribute(name);
 	}
 	
-	public static HashSet<Node> appendTagChildreen(Node node, boolean deep, HashSet<Node> out){
+	public static LinkedHashSet<Node> appendTagChildreen(Node node, boolean deep, LinkedHashSet<Node> out){
 		NodeList list = node.getChildNodes();
 		if(list != null)
 		for(int i = 0; i < list.getLength(); i++){

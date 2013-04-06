@@ -26,6 +26,11 @@ public class Rebuild {
 		jQuery.get("body").append(jQuery.create("test#tes.te.t.e[tz=tz][z=z]"));
 		
 		System.out.println(jQuery.get("test").toString());
+		
+		System.out.println(jQuery.get("test#tes.te.t.e[tz=tz][z=z],div").toString());
+		//System.out.println(CssUtilities.get(CssUtilities.parseSelector("test#tes.te.t.e[tz=tz][z=z]"), jQuery.getDocument()));
+		
+		
         System.out.println(jQuery.toString());
 	}
 
