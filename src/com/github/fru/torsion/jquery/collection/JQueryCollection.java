@@ -1,13 +1,18 @@
-package com.github.fru.torsion.jquery;
+package com.github.fru.torsion.jquery.collection;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.w3c.dom.Node;
 
-import com.github.fru.torsion.jquery.filter.BasicUtilities;
+import com.github.fru.torsion.jquery.JQuery;
 import com.github.fru.torsion.jquery.filter.Filter;
+import com.github.fru.torsion.jquery.utils.AttributeUtilities;
+import com.github.fru.torsion.jquery.utils.BasicUtilities;
+import com.github.fru.torsion.jquery.utils.InsertionUtilities;
+import com.github.fru.torsion.jquery.utils.TraversalUtilities;
 
-public class JQueryCollection {
+public class JQueryCollection extends DomTraversal{
 
 	/*
 	 * TODO: Stack of recent collections, support for the following: -addBack,
@@ -15,7 +20,7 @@ public class JQueryCollection {
 	 */
 
 	JQuery jQuery;
-	LinkedHashSet<Node> collection = new LinkedHashSet<Node>();
+	Collection<Node> collection = new LinkedHashSet<Node>();
 
 	public JQueryCollection(JQuery jQuery) {
 		this.jQuery = jQuery;
@@ -43,6 +48,16 @@ public class JQueryCollection {
 
 	public JQueryCollection add(JQueryCollection content) {
 		this.collection.addAll(content.collection);
+		return this;
+	}
+	
+	public JQueryCollection add(Collection<Node> collection){
+		this.collection.addAll(collection);
+		return this;
+	}
+	
+	public JQueryCollection add(Node node){
+		this.collection.add(node);
 		return this;
 	}
 
@@ -96,7 +111,7 @@ public class JQueryCollection {
 
 	public JQueryCollection append(String content) {
 		for (Node t : this.collection)
-			for (Node n : jQuery.parseHtml(content))
+			for (Node n : jQuery.parseHtml( content ))
 				t.appendChild(n);
 		return this;
 	}

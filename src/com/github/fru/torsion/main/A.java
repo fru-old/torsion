@@ -1,14 +1,19 @@
-package com.github.fru.torsion.example;
+package com.github.fru.torsion.main;
 
+@SuppressWarnings("unused")
 public class A {
 
 	public Object t;
 
 	public int first(int i) {
-		@SuppressWarnings("unused")
+		
 		A o = this;
 		int x = i;
 		int y = 45;
+		
+		long z = 456L;
+		
+		String test = "teststring";
 
 		while (true) {
 			if (y > 0) {

@@ -1,5 +1,7 @@
-package com.github.fru.torsion.jquery;
+package com.github.fru.torsion.jquery.utils;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import org.w3c.dom.Document;
@@ -18,27 +20,34 @@ public class TraversalUtilities {
 	 * LinkedHashSet
 	 */
 
-	public static LinkedHashSet<Node> getAll(Document doc) {
-		return TraversalUtilities.appendElementChildreen(doc, true, new LinkedHashSet<Node>());
+	public static Collection<Node> getAll(final Document doc) {
+		return new ImmutableCollectionProxy<Node>( new Iterable<Node>() {
+
+			@Override
+			public Iterator<Node> iterator() {
+				return new ImmutableCollectionProxy.IterateAllNodes(doc);
+			}
+			
+		});
 	}
 
-	public static LinkedHashSet<Node> getDescendants(Iterable<Node> current) {
+	public static Collection<Node> getDescendants(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			TraversalUtilities.appendElementChildreen(node, true, out);
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getChildreen(Iterable<Node> current) {
+	public static Collection<Node> getChildreen(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			TraversalUtilities.appendElementChildreen(node, false, out);
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	private static LinkedHashSet<Node> appendElementChildreen(Node node, boolean deep, LinkedHashSet<Node> out) {
+	private static Collection<Node> appendElementChildreen(Node node, boolean deep, LinkedHashSet<Node> out) {
 		NodeList list = node.getChildNodes();
 		if (list != null) for (int i = 0; i < list.getLength(); i++) {
 			Node child = list.item(i);
@@ -47,10 +56,10 @@ public class TraversalUtilities {
 				if (deep) appendElementChildreen(child, deep, out);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getNext(Iterable<Node> current) {
+	public static Collection<Node> getNext(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			if (node.getNextSibling() != null) {
@@ -58,10 +67,10 @@ public class TraversalUtilities {
 				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getNextAll(Iterable<Node> current) {
+	public static Collection<Node> getNextAll(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			while (node.getNextSibling() != null) {
@@ -69,10 +78,10 @@ public class TraversalUtilities {
 				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getPrev(Iterable<Node> current) {
+	public static Collection<Node> getPrev(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			if (node.getPreviousSibling() != null) {
@@ -80,10 +89,10 @@ public class TraversalUtilities {
 				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getPrevAll(Iterable<Node> current) {
+	public static Collection<Node> getPrevAll(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			while (node.getPreviousSibling() != null) {
@@ -91,10 +100,10 @@ public class TraversalUtilities {
 				if (node.getNodeType() == Node.ELEMENT_NODE) out.add(node);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
-	public static LinkedHashSet<Node> getAncestors(Iterable<Node> current) {
+	public static Collection<Node> getAncestors(Iterable<Node> current) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : current) {
 			while (node.getParentNode() != null) {
@@ -102,7 +111,7 @@ public class TraversalUtilities {
 				out.add(node);
 			}
 		}
-		return out;
+		return new ImmutableCollectionProxy<Node>( out );
 	}
 
 }

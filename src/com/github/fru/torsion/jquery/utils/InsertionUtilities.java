@@ -1,4 +1,4 @@
-package com.github.fru.torsion.jquery;
+package com.github.fru.torsion.jquery.utils;
 
 import java.util.ArrayList;
 

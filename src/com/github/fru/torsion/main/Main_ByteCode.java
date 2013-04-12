@@ -1,4 +1,4 @@
-package com.github.fru.torsion.example;
+package com.github.fru.torsion.main;
 
 import java.io.IOException;
 

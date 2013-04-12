@@ -1,10 +1,11 @@
 package com.github.fru.torsion.jquery.filter;
 
-import java.util.LinkedHashSet;
+import java.util.Collection;
 
 import org.w3c.dom.Node;
 
-import com.github.fru.torsion.jquery.AttributeUtilities;
+import com.github.fru.torsion.jquery.utils.AttributeUtilities;
+import com.github.fru.torsion.jquery.utils.BasicUtilities;
 
 class BasicSelector extends AbstractSelector {
 	private CssToken token;
@@ -42,7 +43,7 @@ class BasicSelector extends AbstractSelector {
 	}
 
 	@Override
-	protected LinkedHashSet<Node> match(LinkedHashSet<Node> nodes) {
+	protected Collection<Node> match(Collection<Node> nodes) {
 		if (token.type == 't' && "*".equals(token.content)) return nodes;
 		return super.match(nodes);
 	}

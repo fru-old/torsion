@@ -1,5 +1,6 @@
 package com.github.fru.torsion.jquery.filter;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.w3c.dom.Node;
@@ -15,7 +16,7 @@ class CustomSelector extends AbstractSelector {
 	}
 
 	@Override
-	protected LinkedHashSet<Node> match(LinkedHashSet<Node> nodes) {
+	protected Collection<Node> match(Collection<Node> nodes) {
 		// TODO: implement custom selector
 		return new LinkedHashSet<Node>();
 	}

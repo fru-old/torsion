@@ -3,10 +3,21 @@ package com.github.fru.torsion.bytecode.utils;
 import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
 
 public class Instruction {
+	
+	public static final String INTEGER_TYPE = "i";
+	public static final String LONG_TYPE = "l";
+	public static final String FLOAT_TYPE = "f";
+	public static final String DOUBLE_TYPE = "d";
+	public static final String REFERENCE_TYPE = "a";
+	public static final String BYTE_TYPE = "b";
+	public static final String CHAR_TYPE = "c";
+	public static final String SHORT_TYPE = "s";
 
 	private Variable out;
 	private Variable[] ins;
 	private final String operation;
+	
+	private String[] type;
 
 	private Pointer<Instruction> reference;
 
@@ -42,6 +53,14 @@ public class Instruction {
 
 	public String getOperation() {
 		return operation;
+	}
+	
+	public void setType(String... type){
+		this.type = type;
+	}
+	
+	public String[] getType(){
+		return this.type;
 	}
 
 	public Variable[] getInputs() {
@@ -99,6 +118,17 @@ public class Instruction {
 	@Override
 	public int hashCode() {
 		return this.out.hashCode() + this.ins.hashCode() >> 6 + this.operation.hashCode() >> 8 + this.reference.hashCode() >> 16;
+	}
+	
+	public static String reduceType(String type){
+		if(type == BYTE_TYPE || type == CHAR_TYPE || type == SHORT_TYPE)return INTEGER_TYPE;
+		return type;
+	}
+	
+	private static final String[] typeOrder = {INTEGER_TYPE, LONG_TYPE, FLOAT_TYPE, DOUBLE_TYPE, REFERENCE_TYPE, BYTE_TYPE, CHAR_TYPE, SHORT_TYPE};
+	
+	public static String getType(int order){
+		return typeOrder[order];
 	}
 
 	public static class Variable {

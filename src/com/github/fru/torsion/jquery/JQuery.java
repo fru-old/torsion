@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.github.fru.torsion.jquery.collection.JQueryCollection;
 import com.github.fru.torsion.jquery.filter.Filter;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -57,14 +58,11 @@ public class JQuery {
 		return new JQueryCollection(this).add(collection);
 	}
 
-	// TODO: mark as non native jquery
 	public JQueryCollection create(String content) {
-		JQueryCollection collection = new JQueryCollection(this);
-		collection.collection.add(new Filter(content).make(doc));
-		return collection;
+		return new JQueryCollection(this).add(new Filter(content).make(doc));
 	}
 
-	public String toHtml() {
+	public static String toString(Document doc) {
 		try {
 			OutputFormat format = new OutputFormat(doc);
 			format.setLineWidth(65);

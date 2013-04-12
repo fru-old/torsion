@@ -1,14 +1,13 @@
-package com.github.fru.torsion.jquery.filter;
+package com.github.fru.torsion.jquery.utils;
 
 import java.util.HashSet;
 
 import org.w3c.dom.Node;
 
-import com.github.fru.torsion.jquery.AttributeUtilities;
 
 public class BasicUtilities {
 
-	protected static HashSet<String> parseClasses(String classes) {
+	public static HashSet<String> parseClasses(String classes) {
 		HashSet<String> out = new HashSet<String>();
 		if (classes != null) for (String s : classes.replaceAll("\\s", ",").split(",")) {
 			if (s.length() > 0) out.add(s);
@@ -16,7 +15,7 @@ public class BasicUtilities {
 		return out;
 	}
 
-	protected static String unparseClasses(HashSet<String> classes) {
+	public static String unparseClasses(HashSet<String> classes) {
 		String out = "";
 		for (String s : classes)
 			out += "," + s;

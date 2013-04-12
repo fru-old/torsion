@@ -171,6 +171,7 @@ public class ClassFile {
 	
 	public String toString() {
 		String out = "";
+		out += "-------- Details --------\n";
 		out += String.format("Minor version [%s]\n", minorVersion);
 		out += String.format("Mayor version [%s]\n", majorVersion);
 		out += String.format("Class access flag  [%s]\n", accessFlags);
@@ -183,6 +184,11 @@ public class ClassFile {
 			out += String.format("Found field [%s] of type [%s]\n",
 					fieldsName[i], fieldsType[i]);
 		}
+		out += "\n-------- Constants --------\n";
+		for(Integer key : constants.keySet()){
+			out += key+": "+constants.get(key)+"\n";
+		}
+		out += "\n-------- Code --------\n";
 		for (int i = 0; i < methodsName.length; i++) {
 			out += toStringMethod(i)+"\n";
 			CodeList<Instruction> code = methodsInstructions.get(i);

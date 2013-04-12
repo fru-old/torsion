@@ -18,7 +18,6 @@ class CssToken {
 	protected static ArrayList<CssToken> parseSelector(String selector) {
 		ArrayList<CssToken> out = new ArrayList<CssToken>();
 		if (selector == null) return out;
-
 		byte[] array = selector.trim().getBytes(Charset.forName("US-ASCII"));
 		PushbackInputStream stream = new PushbackInputStream(new ByteArrayInputStream(array));
 

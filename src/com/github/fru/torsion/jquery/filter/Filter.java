@@ -1,14 +1,14 @@
 package com.github.fru.torsion.jquery.filter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.github.fru.torsion.jquery.JQueryCollection;
+import com.github.fru.torsion.jquery.collection.JQueryCollection;
 
 public class Filter {
 
@@ -21,7 +21,7 @@ public class Filter {
 	}
 
 	public Filter(String selector) {
-		token = CssToken.parseSelector(selector);
+		token = CssToken.parseSelector(selector.toString());
 	}
 
 	public Filter(JQueryCollection collection) {
@@ -29,10 +29,10 @@ public class Filter {
 		this.collection = collection;
 	}
 
-	public HashSet<Node> filter(LinkedHashSet<Node> roots) {
-		if (token != null) return filter(roots, roots, token);
+	public Collection<Node> filter(Collection<Node> collection2) {
+		if (token != null) return filter(collection2, collection2, token);
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
-		for (Node node : roots) {
+		for (Node node : collection2) {
 			if (collection.contains(node)) out.add(node);
 		}
 		return out;
@@ -64,7 +64,7 @@ public class Filter {
 		}
 	}
 
-	private static LinkedHashSet<Node> filter(LinkedHashSet<Node> original, LinkedHashSet<Node> out, List<CssToken> list) {
+	private static Collection<Node> filter(Collection<Node> original, Collection<Node> out, List<CssToken> list) {
 		if (list.size() == 0) return out;
 
 		CssToken current = list.get(0);

@@ -1,12 +1,13 @@
 package com.github.fru.torsion.jquery.filter;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.w3c.dom.Node;
 
 abstract class AbstractSelector {
 
-	protected LinkedHashSet<Node> match(LinkedHashSet<Node> nodes) {
+	protected Collection<Node> match(Collection<Node> nodes) {
 		LinkedHashSet<Node> out = new LinkedHashSet<Node>();
 		for (Node node : nodes)
 			if (match(node)) out.add(node);

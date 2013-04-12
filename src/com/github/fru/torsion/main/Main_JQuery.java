@@ -1,4 +1,4 @@
-package com.github.fru.torsion.example;
+package com.github.fru.torsion.main;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,24 +16,33 @@ public class Main_JQuery {
 	static JQuery jQuery = getHtmlDocument();
 
 	public static void main(String[] args) throws Exception {
+		double time = System.currentTimeMillis();
+		
 		jQuery.get("body").attr("id", "body");
 
-		int count = 5;
+		int count = 500;
+		
+		StringBuilder divs = new StringBuilder();
 		for (int i = 0; i < count; i++) {
-			jQuery.get("body").append("<div id='" + i + "' />");
+			divs.append("<div id='");
+			divs.append(i);
+			divs.append("' />");
 		}
+		jQuery.get("body").append(divs.toString());
 
 		jQuery.get("div").after("<test/>");
 		jQuery.get("body").before("test");
 		jQuery.get("body").append(jQuery.create("test#tes.te.t.e[tz=tz][z=z]"));
 
-		System.out.println(jQuery.get("test").toString());
-
-		System.out.println(jQuery.get("test#tes.te.t.e[tz=tz][z=z],div").toString());
+		System.out.println(jQuery.get("body > test#tes.te.t.e[tz=tz][z=z],div").toString());
 
 		System.out.println(jQuery.get("div+test+div").toString());
-
-		System.out.println(jQuery.toHtml());
+		time = (System.currentTimeMillis()-time)/1000;
+		
+		System.out.println(JQuery.toString(jQuery.getDocument()));
+		
+		System.out.println(time);
+		
 	}
 
 	public static JQuery getHtmlDocument() {

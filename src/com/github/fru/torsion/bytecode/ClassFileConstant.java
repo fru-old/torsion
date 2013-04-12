@@ -18,6 +18,10 @@ public class ClassFileConstant {
 	int ref2 = -1;
 
 	private Type type;
+	
+	public String getConstant(){
+		return value;
+	}
 
 	private ClassFileConstant(String value) {
 		this.value = value;
