@@ -7,7 +7,7 @@ import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 
-public class ConversionBytecodeParser implements BytecodeParser{
+public class ConversionBytecodeParser extends BytecodeParser{
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException {
 		String fromType = null;

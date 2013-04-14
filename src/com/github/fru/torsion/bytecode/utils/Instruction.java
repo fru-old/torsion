@@ -155,6 +155,10 @@ public class Instruction {
 		public Variable() {
 			this(counter++);
 		}
+		
+		public static void offsetCounter(int count){
+			counter += count;
+		}
 
 		public Object getValue() {
 			return this.value;
@@ -181,7 +185,7 @@ public class Instruction {
 			if (this == Variable.END) return "LOCATION end";
 			if (this == Variable.RETURN) return "RETURN";
 			if (type == VariableType.STACK) return "STACK";
-			if (type == VariableType.CONSTANT) return "CONST \"" + value + "\"";
+			if (type == VariableType.CONSTANT) return "CONST " + value;
 			if (type == VariableType.LOCAL) return "LOCAL " + value;
 			if (type == VariableType.LOCATION) return "LOCATION " + value;
 			if (value == null) return "";

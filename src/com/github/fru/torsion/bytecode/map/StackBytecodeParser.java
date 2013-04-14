@@ -7,7 +7,7 @@ import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 
-public abstract class StackBytecodeParser implements BytecodeParser{
+public abstract class StackBytecodeParser extends BytecodeParser{
 	
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException{
 		bytecode = normaizeBytecode(bytecode) + 0x15;

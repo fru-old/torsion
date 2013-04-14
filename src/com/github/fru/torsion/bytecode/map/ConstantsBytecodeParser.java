@@ -10,7 +10,7 @@ import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 
-public class ConstantsBytecodeParser implements BytecodeParser {
+public class ConstantsBytecodeParser extends BytecodeParser {
 
 	Map<Integer, ClassFileConstant> constants;
 
@@ -63,7 +63,7 @@ public class ConstantsBytecodeParser implements BytecodeParser {
 		ClassFileConstant constant = constants.get(index);
 		String out = constant.getConstant();
 		if(constant.getType() == Type.String){
-			out = "\""+constants.get(Integer.parseInt(out)).getConstant()+"\"";
+			out = "\""+constants.get(constant.getRef1()).getConstant()+"\"";
 		} 
 		return out;
 	}
