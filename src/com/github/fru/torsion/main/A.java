@@ -4,6 +4,13 @@ package com.github.fru.torsion.main;
 public class A {
 
 	public Object t;
+	
+	public Object[] test(Object[] o){
+		this.test(null);
+		int i = 0;
+		Object obj = String.CASE_INSENSITIVE_ORDER;
+		return null;
+	}
 
 	public int first(int i) {
 		
@@ -45,5 +52,5 @@ public class A {
 			}
 
 	}
-
+	
 }

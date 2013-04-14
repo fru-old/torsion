@@ -33,12 +33,27 @@ public class JQueryCollection extends DomTraversal{
 	// TOOO: remove - for experimental use only
 	@Override
 	public String toString() {
-		String out = "";
+		int i = 0;
+		StringBuilder out = new StringBuilder();
 		for (Node n : collection) {
+			i++;
 			String id = AttributeUtilities.getAttribute(n, "id");
-			out += n.getNodeName() + (id == null ? "" : "#" + id) + ",";
+			out.append(n.getNodeName());
+			if(id != null){
+				out.append("#");
+				out.append(id);
+			}
+			out.append(",");
+			if(i%10==0)out.append("\n");
 		}
 		return out.length() > 0 ? out.substring(0, out.length() - 1) : "";
+	}
+	
+	public JQueryCollection clone(){
+		JQueryCollection collection = new JQueryCollection(this.jQuery);
+		for(Node n : this.collection)
+			collection.collection.add(n.cloneNode(true));
+		return collection;
 	}
 
 	public JQueryCollection add(String content) {
@@ -68,7 +83,7 @@ public class JQueryCollection extends DomTraversal{
 	}
 
 	// Add nodes as siblings
-	public JQueryCollection after(String content) {
+	public JQueryCollection afterHtml(String content) {
 		InsertionUtilities.after(collection, jQuery.parseHtml(content));
 		return this;
 	}
@@ -78,7 +93,7 @@ public class JQueryCollection extends DomTraversal{
 		return this;
 	}
 
-	public JQueryCollection before(String content) {
+	public JQueryCollection beforeHtml(String content) {
 		InsertionUtilities.before(collection, jQuery.parseHtml(content));
 		return this;
 	}
@@ -103,13 +118,15 @@ public class JQueryCollection extends DomTraversal{
 
 	// Add nodes as childreen
 	public JQueryCollection append(JQueryCollection content) {
-		for (Node t : this.collection)
+		for (Node t : this.collection){
 			for (Node n : content.collection)
 				t.appendChild(n);
+			content = content.clone();
+		}
 		return this;
 	}
 
-	public JQueryCollection append(String content) {
+	public JQueryCollection appendHtml(String content) {
 		for (Node t : this.collection)
 			for (Node n : jQuery.parseHtml( content ))
 				t.appendChild(n);

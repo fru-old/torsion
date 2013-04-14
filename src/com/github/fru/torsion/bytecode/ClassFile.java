@@ -144,6 +144,9 @@ public class ClassFile {
 		    	}
 		    }catch(EOFException exception){
 		    	// Expected
+		    }catch(IOException unexpected){
+		    	unexpected.printStackTrace();
+		    	System.exit(-1);
 		    }
 		    
 		    Variable.offsetCounter(maxLocal);
@@ -191,8 +194,8 @@ public class ClassFile {
 		for(Integer key : constants.keySet()){
 			out += key+": "+constants.get(key)+"\n";
 		}
-		out += "\n-------- Code --------\n";
 		for (int i = 0; i < methodsName.length; i++) {
+			out += "\n-------- Code --------\n";
 			out += toStringMethod(i)+"\n";
 			CodeList<Instruction> code = methodsInstructions.get(i);
 			if(code != null)out += toStringIndentedCode(code);

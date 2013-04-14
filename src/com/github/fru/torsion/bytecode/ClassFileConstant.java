@@ -2,6 +2,7 @@ package com.github.fru.torsion.bytecode;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 
@@ -57,6 +58,19 @@ public class ClassFileConstant {
 			out += ref1 + " - " + ref2;
 		} else {
 			out += ref1;
+		}
+		return out;
+	}
+	
+	public String toString(Map<Integer, ClassFileConstant> constants){
+		String out = "";
+		if (type != null) out += type + ": ";
+		if (value != null) {
+			out += value;
+		} else if (ref2 != -1) {
+			out += constants.get(ref1).toString(constants) + " - " + constants.get(ref2).toString(constants);
+		} else {
+			out += constants.get(ref1).toString(constants);
 		}
 		return out;
 	}

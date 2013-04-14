@@ -20,7 +20,7 @@ public class Main_JQuery {
 		
 		jQuery.get("body").attr("id", "body");
 
-		int count = 500;
+		int count = 25;
 		
 		StringBuilder divs = new StringBuilder();
 		for (int i = 0; i < count; i++) {
@@ -28,21 +28,20 @@ public class Main_JQuery {
 			divs.append(i);
 			divs.append("' />");
 		}
-		jQuery.get("body").append(divs.toString());
-
-		jQuery.get("div").after("<test/>");
-		jQuery.get("body").before("test");
+		jQuery.get("body").appendHtml(divs.toString());
+		jQuery.get("div").afterHtml("<test/>");
+		jQuery.get("body").beforeHtml("test");
 		jQuery.get("body").append(jQuery.create("test#tes.te.t.e[tz=tz][z=z]"));
-
-		System.out.println(jQuery.get("body > test#tes.te.t.e[tz=tz][z=z],div").toString());
-
+		jQuery.get("div").append(jQuery.create("te#te.class"));
+		
+		jQuery.get("div").append(jQuery.get("div").clone());
+		
+		System.out.println(jQuery.get("body > test#tes.te.t.e[tz=tz][z=z]").toString());
 		System.out.println(jQuery.get("div+test+div").toString());
+		System.out.println(JQuery.toString(jQuery.getDocument()));	
 		time = (System.currentTimeMillis()-time)/1000;
 		
-		System.out.println(JQuery.toString(jQuery.getDocument()));
-		
 		System.out.println(time);
-		
 	}
 
 	public static JQuery getHtmlDocument() {

@@ -4,14 +4,16 @@ import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
 
 public class Instruction {
 	
-	public static final String INTEGER_TYPE = "i";
-	public static final String LONG_TYPE = "l";
-	public static final String FLOAT_TYPE = "f";
-	public static final String DOUBLE_TYPE = "d";
-	public static final String REFERENCE_TYPE = "a";
-	public static final String BYTE_TYPE = "b";
-	public static final String CHAR_TYPE = "c";
-	public static final String SHORT_TYPE = "s";
+	public static final String VOID_TYPE = "V";
+	public static final String INTEGER_TYPE = "I";
+	public static final String LONG_TYPE = "J";
+	public static final String FLOAT_TYPE = "D";
+	public static final String DOUBLE_TYPE = "F";
+	public static final String REFERENCE_TYPE = "L";
+	public static final String BYTE_TYPE = "B";
+	public static final String CHAR_TYPE = "C";
+	public static final String SHORT_TYPE = "S";
+	public static final String ARRAY_TYPE = "[";
 
 	private Variable out;
 	private Variable[] ins;
@@ -55,8 +57,9 @@ public class Instruction {
 		return operation;
 	}
 	
-	public void setType(String... type){
+	public Instruction setType(String... type){
 		this.type = type;
+		return this;
 	}
 	
 	public String[] getType(){
