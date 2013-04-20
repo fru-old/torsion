@@ -25,8 +25,8 @@ public class GotoBytecodeParser extends BytecodeParser {
 			op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x99];
 			mid = new Variable();
 			location = byteStream.getByteCount() + (short) byteStream.findShort();
-			out.add(new Instruction(mid, op, Variable.STACK, 0));
-			out.add(new Instruction(null, "goto", mid, location));
+			out.add(new Instruction(op, Variable.STACK, 0, mid));
+			out.add(new Instruction("goto", mid, location, null));
 			break;
 		case 0x9F:
 		case 0xA0:
@@ -37,21 +37,21 @@ public class GotoBytecodeParser extends BytecodeParser {
 			op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x9F];
 			mid = new Variable();
 			location = byteStream.getByteCount() + (short) byteStream.findShort();
-			out.add(new Instruction(mid, op, Variable.STACK, Variable.STACK));
-			out.add(new Instruction(null, "goto", mid, location));
+			out.add(new Instruction(op, Variable.STACK, Variable.STACK, mid));
+			out.add(new Instruction("goto", mid, location, null));
 			break;
 		case 0xA5:
 		case 0xA6:
 			op = new String[] { "==", "!=" }[bytecode - 0xA5];
 			mid = new Variable();
 			location = byteStream.getByteCount() + (short) byteStream.findShort();
-			out.add(new Instruction(mid, op, Variable.STACK, Variable.STACK));
-			out.add(new Instruction(null, "goto", mid, location));
+			out.add(new Instruction(op, Variable.STACK, Variable.STACK, mid));
+			out.add(new Instruction("goto", mid, location, null));
 			break;
 		case 0xA7:
 			cons = "true";
 			location = byteStream.getByteCount() + (short) byteStream.findShort();
-			out.add(new Instruction(null, "goto", cons, location));
+			out.add(new Instruction("goto", cons, location, null));
 			break;
 		case 0xA8:
 		case 0xA9:
@@ -65,12 +65,12 @@ public class GotoBytecodeParser extends BytecodeParser {
 		case 0xAF:
 		case 0xB0:
 			cons = "true";
-			out.add(new Instruction(Variable.RETURN, "=", Variable.STACK));
-			out.add(new Instruction(null, "goto", Variable.END));
+			out.add(new Instruction("=", Variable.STACK, Variable.RETURN));
+			out.add(new Instruction("goto", Variable.END, null));
 			break;
 		case 0xB1:
 			cons = "true";
-			out.add(new Instruction(null, "goto", cons, Variable.END));
+			out.add(new Instruction("goto", cons, Variable.END, null));
 			break;
 		case 0xC6:
 		case 0xC7:
@@ -78,12 +78,12 @@ public class GotoBytecodeParser extends BytecodeParser {
 			mid = new Variable();
 			cons = "null";
 			location = byteStream.getByteCount() + (short) byteStream.findShort();
-			out.add(new Instruction(mid, op, Variable.STACK, cons));
-			out.add(new Instruction(null, "goto", mid, location));
+			out.add(new Instruction(op, Variable.STACK, cons, mid));
+			out.add(new Instruction("goto", mid, location, null));
 		case 0xC8:
 			cons = "true";
 			location = byteStream.getByteCount() + (short) byteStream.findInt();
-			out.add(new Instruction(null, "goto", cons, location));
+			out.add(new Instruction("goto", cons, location, null));
 		case 0xC9:
 			throw new IOException("subroutines are not supported.");
 		}

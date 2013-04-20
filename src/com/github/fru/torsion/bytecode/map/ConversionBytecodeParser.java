@@ -78,7 +78,7 @@ public class ConversionBytecodeParser extends BytecodeParser{
 			break;
 		}
 		
-		Instruction i = new Instruction(Variable.STACK,"()"+toType,Variable.STACK);
+		Instruction i = new Instruction("()",toType,Variable.STACK,Variable.STACK);
 		i.setType(toType, fromType);
 		out.add(i);
 	}

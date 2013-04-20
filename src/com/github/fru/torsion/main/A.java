@@ -41,7 +41,7 @@ public class A {
 		return y;
 	}
 
-	public static void second(long i) {
+	public static boolean second(long i, long k, Object obj) {
 		// System.out.println("test");
 		// Math.abs(345);
 
@@ -50,7 +50,12 @@ public class A {
 				int j = 0;
 				i = j;
 			}
-
+		
+		byte b = 56;
+		b++;
+		b++;
+		boolean b2 = b < 255;
+		return b2;
 	}
 	
 }

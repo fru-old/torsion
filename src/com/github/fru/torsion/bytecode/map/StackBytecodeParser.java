@@ -37,14 +37,14 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		
 		@Override
 		protected void producePrimitive(String type, int local, ArrayList<Instruction> out) {
-			Instruction i = new Instruction(Variable.STACK, "=", local);
+			Instruction i = new Instruction("=", local,Variable.STACK);
 			i.setType(type);
 			out.add(i);
 		}
 
 		@Override
 		protected void produceArray(String type, ArrayList<Instruction> out) {
-			Instruction i = new Instruction(Variable.STACK, "[]"+type, Variable.STACK, Variable.STACK);
+			Instruction i = new Instruction("[]"+type, Variable.STACK, Variable.STACK,Variable.STACK);
 			i.setType(Instruction.reduceType(type), Instruction.REFERENCE_TYPE, Instruction.INTEGER_TYPE);
 			out.add(i);
 		}
@@ -62,14 +62,14 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		
 		@Override
 		protected void producePrimitive(String type, int local, ArrayList<Instruction> out) {
-			Instruction i = new Instruction(local, "=", Variable.STACK);
+			Instruction i = new Instruction("=", Variable.STACK,local);
 			i.setType(type);
 			out.add(i);
 		}
 
 		@Override
 		protected void produceArray(String type, ArrayList<Instruction> out) {
-			Instruction i = new Instruction(null, "[]"+type, Variable.STACK, Variable.STACK, Variable.STACK);
+			Instruction i = new Instruction("[]", type, Variable.STACK, Variable.STACK, Variable.STACK,null);
 			i.setType(null, Instruction.REFERENCE_TYPE, Instruction.INTEGER_TYPE, Instruction.reduceType(type));
 			out.add(i);
 		}

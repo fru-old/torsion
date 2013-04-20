@@ -26,9 +26,9 @@ public class OperationBytecodeParser extends BytecodeParser {
 		
 		Instruction i;
 		if(0x74 <= bytecode && bytecode <= 0x77){//Negation
-			 i = new Instruction(Variable.STACK,operation,Variable.STACK);
+			 i = new Instruction(operation,Variable.STACK,Variable.STACK);
 		}else{
-			i = new Instruction(Variable.STACK,operation,Variable.STACK,Variable.STACK);
+			i = new Instruction(operation,Variable.STACK,Variable.STACK,Variable.STACK);
 		}
 		i.setType(type);
 		out.add(i);

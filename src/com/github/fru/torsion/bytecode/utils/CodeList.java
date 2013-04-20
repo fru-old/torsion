@@ -105,6 +105,17 @@ public class CodeList<T> extends AbstractList<T> {
 	public Pointer<T> get(Object key) {
 		return hashMap.get(key);
 	}
+	
+	@Override
+	public String toString(){
+		StringBuilder out = new StringBuilder();
+		for(T t : this){
+			out.append(t.toString());
+			out.append('\n');
+		}
+		if(out.length()>0)out.setLength(out.length()-1);
+		return out.toString();
+	}
 
 	public AbstractList<Pointer<T>> getPointer() {
 		final CodeList<T> parent = this;

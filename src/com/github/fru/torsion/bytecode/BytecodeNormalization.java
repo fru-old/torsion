@@ -45,15 +45,15 @@ public class BytecodeNormalization {
 				Pointer<Instruction> label = lookup.get(current.getData().getInputs()[1]);
 				if (label == null) continue;
 				Variable identifier = new Variable();
-				current.getData().setOutput(identifier);
-				current.getData().setInput(new Variable[0]);
+				current.getData().setOp(-1,identifier);
+				current.getData().clear();
 				Pointer<Instruction> newLabel;
 				if (method.indexOf(label.getData()) > method.indexOf(current.getData())) { // jump
 																							// forward
-					newLabel = label.addAfter(method, new Instruction(identifier, "end"));
+					newLabel = label.addAfter(method, new Instruction("end",identifier));
 
 				} else { // jump backwards
-					newLabel = label.addAfter(method, new Instruction(identifier, "start"));
+					newLabel = label.addAfter(method, new Instruction("start",identifier));
 				}
 				current.getData().setReference(newLabel);
 				newLabel.getData().setReference(current);
@@ -77,7 +77,7 @@ public class BytecodeNormalization {
 						}
 					}
 				}
-				Pointer<Instruction> iend = lastInteresting.addAfter(method, new Instruction(istart.getData().getOutput(), "end"));
+				Pointer<Instruction> iend = lastInteresting.addAfter(method, new Instruction("end",istart.getData().getOp(-1)));
 				order.addAfter(lastInteresting, iend);
 				iend.getData().setReference(istart);
 				istart.getData().setReference(iend);
@@ -110,7 +110,7 @@ public class BytecodeNormalization {
 					}
 				}
 
-				Variable close = iend.getData().getOutput();
+				Variable close = iend.getData().getOp(-1);
 
 				Variable splitVariable = null;
 
@@ -120,27 +120,27 @@ public class BytecodeNormalization {
 
 						if (splitVariable == null && igoto.getData().getInputs().length > 0) {
 							splitVariable = new Variable();
-							iend.addAfter(method, new Instruction(splitVariable, "=", "true"));
-							igoto.addBefore(method, new Instruction(splitVariable, "=", igoto.getData().getInputs()[0]));
+							iend.addAfter(method, new Instruction("=", "true", splitVariable));
+							igoto.addBefore(method, new Instruction("=", igoto.getData().getInputs()[0], splitVariable));
 							igoto.getData().getInputs()[0] = splitVariable;
 						}
 
-						Pointer<Instruction> newStart = splitStart.addAfter(method, new Instruction(close, "start"));
+						Pointer<Instruction> newStart = splitStart.addAfter(method, new Instruction("start",close));
 						iend.getData().setReference(newStart);
 						newStart.getData().setReference(iend);
 						order.addBefore(splitStart, newStart);
 
-						Pointer<Instruction> newGoto = newStart.addAfter(method, new Instruction(close, "goto"));
-						newGoto.getData().setInput(new Variable[] { splitVariable });
+						Pointer<Instruction> newGoto = newStart.addAfter(method, new Instruction("goto",close));
+						newGoto.getData().add("<pointer>",splitVariable);
 						newGoto.getData().setReference(iend);
 						order.addBefore(newStart, newGoto);
 
-						iend = splitStart.addBefore(method, new Instruction(close, "end"));
+						iend = splitStart.addBefore(method, new Instruction("end",close));
 						order.addAfter(splitStart, iend);
 					}
 				}
 
-				Pointer<Instruction> istart = lastInteresting.addBefore(method, new Instruction(close, "start"));
+				Pointer<Instruction> istart = lastInteresting.addBefore(method, new Instruction("start",close));
 				order.addAfter(lastInteresting, istart);
 				iend.getData().setReference(istart);
 				istart.getData().setReference(iend);
@@ -159,9 +159,9 @@ public class BytecodeNormalization {
 					}
 				}
 			}
-			if (i.getOutput() != null && i.getOutput().isStack()) {
-				i.setOutput(new Variable());
-				stack.push(i.getOutput());
+			if (i.getOp(-1) != null && i.getOp(-1).isStack()) {
+				i.setOp(-1,new Variable());
+				stack.push(i.getOp(-1));
 			}
 		}
 	}

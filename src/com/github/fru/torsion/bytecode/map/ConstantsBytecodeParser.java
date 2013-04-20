@@ -54,7 +54,7 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 			constant = getConstant(location);
 		}
 		
-		Instruction i = new Instruction(Variable.STACK,"=",constant);
+		Instruction i = new Instruction("=",constant,Variable.STACK);
 		i.setType(type);
 		out.add(i);
 	}

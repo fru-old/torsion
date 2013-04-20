@@ -21,6 +21,7 @@ public abstract class BytecodeParser {
 	static StackBytecodeParser store = new StackBytecodeParser.Store();
 	static StackBytecodeParser load = new StackBytecodeParser.Load();
 	static GotoBytecodeParser jump = new GotoBytecodeParser();
+	static UnsupportedBytecodeParser unsup = new UnsupportedBytecodeParser();
 	
 	
 	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants)
@@ -29,7 +30,7 @@ public abstract class BytecodeParser {
 		if(invocation == null || invocation.constants != constants)invocation = new InvocationBytecodeParser(constants);
 		
 		ArrayList<Instruction> out = new ArrayList<Instruction>();
-		out.add(new Instruction(null, ":", offset));
+		out.add(new Instruction(":", offset, null));
 		
 		int bytecode = byteStream.findNext();
 		
@@ -40,6 +41,7 @@ public abstract class BytecodeParser {
 		else if(load.isApplicable(bytecode))load.parse(bytecode, byteStream, out);
 		else if(invocation.isApplicable(bytecode))invocation.parse(bytecode, byteStream, out);
 		else if(jump.isApplicable(bytecode))jump.parse(bytecode, byteStream, out);
+		else if(unsup.isApplicable(bytecode))unsup.parse(bytecode, byteStream, out);
 		else{
 			System.out.println("Could not parse: "+bytecode);
 			
@@ -60,6 +62,7 @@ public abstract class BytecodeParser {
 		else if(load.isApplicable(bytecode))return true;
 		else if(invocation.isApplicable(bytecode))return true;
 		else if(jump.isApplicable(bytecode))return true;
+		else if(unsup.isApplicable(bytecode))return true;
 		else{
 			return false;
 		}

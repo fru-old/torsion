@@ -1,5 +1,9 @@
 package com.github.fru.torsion.bytecode.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
 
 public class Instruction {
@@ -15,42 +19,60 @@ public class Instruction {
 	public static final String SHORT_TYPE = "S";
 	public static final String ARRAY_TYPE = "[";
 
-	private Variable out;
-	private Variable[] ins;
+	private ArrayList<Variable> ins = new ArrayList<Variable>();
 	private final String operation;
 	
 	private String[] type;
 
 	private Pointer<Instruction> reference;
 
-	public Instruction(Object out, String operation, Object... ins) {
-		this(new Variable(out), operation, Variable.convert(ins));
+	public Instruction(String operation, Object... ins) {
+		this(operation, Variable.convert(ins));
 	}
 
-	public Instruction(Variable out, String operation, Variable... ins) {
-		this.out = out;
+	public Instruction(String operation, Variable... ins) {
 		this.operation = operation;
-		this.ins = ins;
+		this.ins.addAll(Arrays.asList(ins));
 		this.reference = null;
 	}
 
 	public Instruction(Variable label, String operation, Pointer<Instruction> reference) {
-		this.out = label;
 		this.operation = operation;
-		this.ins = null;
+		this.ins.add(label);
 		this.reference = reference;
 	}
 
-	public void setOutput(Variable out) {
+	/*public void setOutput(Variable out) {
 		this.out = out;
+	}*/
+	
+	public Instruction clear(){
+		this.ins.clear();
+		return this;
+	}
+	
+	public Instruction add(String type, Variable name){
+		this.ins.add(name);
+		return this;
 	}
 
-	public void setInput(Variable[] ins) {
-		this.ins = ins;
-	}
-
+	/*
 	public Variable getOutput() {
 		return out;
+	}*/
+	
+	public Variable getOp(int i){
+		//modulo wrap around for negative numbers
+		int b = this.ins.size();
+		if(b < 1)return null;
+		i =  (i % b + b) % b;
+		return this.ins.get(i);
+	}
+	
+	public void setOp(int i, Variable value){
+		int b = this.ins.size();
+		i =  (i % b + b) % b;
+		this.ins.set(i, value);
 	}
 
 	public String getOperation() {
@@ -67,8 +89,9 @@ public class Instruction {
 	}
 
 	public Variable[] getInputs() {
-		if (ins == null) return (ins = new Variable[0]);
-		return ins;
+		Collection<Variable> out = ins;
+		if(ins.size() > 0)out = ins.subList(0, ins.size()-1);
+		return out.toArray(new Variable[0]);
 	}
 
 	public Pointer<Instruction> getReference() {
@@ -89,20 +112,17 @@ public class Instruction {
 		Instruction ot = (Instruction) o;
 		if (ot.ins == null ^ this.ins == null) return false;
 		if (this.ins != null) {
-			if (this.ins.length != ot.ins.length) return false;
-			for (int i = 0; i < this.ins.length; i++) {
-				if (!this.ins[i].equals(ot.ins[i])) return false;
+			if (this.ins.size() != ot.ins.size()) return false;
+			for (int i = 0; i < this.ins.size(); i++) {
+				if (!this.ins.get(i).equals(ot.ins.get(i))) return false;
 			}
 		}
 
 		if (ot.operation == null ^ this.operation == null) return false;
 		if (ot.operation != null && !ot.operation.equals(this.operation)) return false;
 
-		if (ot.out == null ^ this.out == null) return false;
-		if (ot.out != null && !ot.out.equals(this.out)) return false;
-
 		if (ot.reference == null ^ this.reference == null) return false;
-		if (ot.reference != null && !ot.reference.equals(this.out)) return false;
+		if (ot.reference != null && !ot.reference.equals(this.reference)) return false;
 
 		return true;
 	}
@@ -114,13 +134,12 @@ public class Instruction {
 			operands += (in == null ? "" : in.toString()) + ", ";
 		}
 		String out = this.operation + extra + " " + operands;
-		if (this.out != null && this.out.value != null) out = this.out + " " + out;
 		return out;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.out.hashCode() + this.ins.hashCode() >> 6 + this.operation.hashCode() >> 8 + this.reference.hashCode() >> 16;
+		return this.ins.hashCode() >> 6 + this.operation.hashCode() >> 8 + this.reference.hashCode() >> 16;
 	}
 	
 	public static String reduceType(String type){

@@ -214,7 +214,7 @@ public class ClassFile {
 				if(tabs.length() > 0){
 					tabs = tabs.substring(1);
 					Instruction p = stack.pop();
-					if(!i.getOutput().equals(p.getOutput())){
+					if(!i.getOp(-1).equals(p.getOp(-1))){
 						throw new RuntimeException();
 					}
 					
