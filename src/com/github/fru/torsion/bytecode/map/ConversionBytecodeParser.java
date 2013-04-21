@@ -2,6 +2,7 @@ package com.github.fru.torsion.bytecode.map;
 
 import java.io.EOFException;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
@@ -10,7 +11,7 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class ConversionBytecodeParser extends BytecodeParser{
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
 		Type fromType = null;
 		Type toType = null;
 		
@@ -79,7 +80,7 @@ public class ConversionBytecodeParser extends BytecodeParser{
 			break;
 		}
 		
-		Instruction i = new Instruction("()",toType,Variable.STACK,Variable.STACK);
+		Instruction i = new Instruction("()",toType,stack.pop(),stack.push(new Variable()));
 		i.setType(toType, fromType);
 		out.add(i);
 	}

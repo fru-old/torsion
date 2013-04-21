@@ -100,7 +100,7 @@ public class Instruction {
 	}
 
 	public static enum VariableType {
-		LOCAL, STACK, CONSTANT, ANNONYM, RETURN, LOCATION;
+		LOCAL, CONSTANT, ANNONYM, RETURN, LOCATION;
 	}
 
 	@Override

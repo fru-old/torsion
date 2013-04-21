@@ -3,6 +3,7 @@ package com.github.fru.torsion.bytecode.map;
 import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.ClassFileConstant.ClassFileConstantType;
@@ -20,7 +21,7 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 	}
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
 		Type type = null;
 		String constant = null;
 		
@@ -55,7 +56,7 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 			constant = getConstant(location);
 		}
 		
-		Instruction i = new Instruction("=",constant,Variable.STACK);
+		Instruction i = new Instruction("=",constant,stack.push(new Variable()));
 		i.setType(type);
 		out.add(i);
 	}

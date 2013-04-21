@@ -4,7 +4,6 @@ import com.github.fru.torsion.bytecode.utils.Instruction.VariableType;
 
 public class Variable {
 
-	public static final Variable STACK = new Variable();
 	public static final Variable END = new Variable();
 
 	private Object value;
@@ -34,14 +33,8 @@ public class Variable {
 		return this.value;
 	}
 
-	// Bugfix: In a perfect world, value should actually never be STACK
-	public boolean isStack() {
-		return value == STACK || this == STACK;
-	}
-
 	public VariableType getType() {
 		if (value == END) return VariableType.LOCATION;
-		if (isStack()) return VariableType.STACK;
 		if (value instanceof Long) return VariableType.LOCATION;
 		if (value instanceof Integer) return VariableType.LOCAL;
 		if (value instanceof String) return VariableType.CONSTANT;
@@ -52,7 +45,6 @@ public class Variable {
 	public String toString() {
 		VariableType type = getType();
 		if (this == Variable.END) return "LOCATION end";
-		if (type == VariableType.STACK) return "STACK";
 		if (type == VariableType.CONSTANT) return "CONST " + value;
 		if (type == VariableType.LOCAL) return ""+ value;
 		if (type == VariableType.LOCATION) return "LOCATION " + value;

@@ -3,6 +3,7 @@ package com.github.fru.torsion.bytecode.map;
 import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
@@ -18,41 +19,41 @@ public class InvocationBytecodeParser extends BytecodeParser{
 	}
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
 		ClassFileConstant constant = constants.get(byteStream.findShort());
 		
 		switch(bytecode){
 		case 0xB2:
-			out.add(new Instruction("=static",constant,Variable.STACK));
+			out.add(new Instruction("=static",constant,stack.push(new Variable())));
 			break;
 		case 0xB3:
-			out.add(new Instruction("=static",Variable.STACK,constant));
+			out.add(new Instruction("=static",stack.pop(),constant));
 			break;
 		case 0xB4:
-			out.add(new Instruction("=field",constant,Variable.STACK));
+			out.add(new Instruction("=field",constant,stack.push(new Variable())));
 			break;
 		case 0xB5:
-			out.add(new Instruction("=field",Variable.STACK,constant));
+			out.add(new Instruction("=field",stack.pop(),constant));
 			break;
 		}
 		
 		switch(bytecode){
 		case 0xB6:
-			out.add(new Instruction("invokevirtual",constant,Variable.STACK,Variable.STACK));
+			out.add(new Instruction("invokevirtual",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xB7:
-			out.add(new Instruction("invokespecial",constant,Variable.STACK,Variable.STACK));
+			out.add(new Instruction("invokespecial",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xB8:
-			out.add(new Instruction("invokestatic",constant,Variable.STACK));
+			out.add(new Instruction("invokestatic",constant,stack.push(new Variable())));
 			break;
 		case 0xB9:
 			byteStream.findShort();
-			out.add(new Instruction("invokeinterface",constant,Variable.STACK,Variable.STACK));
+			out.add(new Instruction("invokeinterface",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xBA:
 			byteStream.findShort();
-			out.add(new Instruction("invokedynamic",constant,Variable.STACK));
+			out.add(new Instruction("invokedynamic",constant,stack.push(new Variable())));
 			break;
 		}
 		//TODO: Invocation need to parse types, to get operand count

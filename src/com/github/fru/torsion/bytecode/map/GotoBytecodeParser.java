@@ -2,6 +2,7 @@ package com.github.fru.torsion.bytecode.map;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
@@ -9,7 +10,7 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class GotoBytecodeParser extends BytecodeParser {
 
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws IOException{
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException{
 		String op = null;
 		Variable mid = null;
 		Variable comp = null;
@@ -34,14 +35,14 @@ public class GotoBytecodeParser extends BytecodeParser {
 			case 0xA3:
 			case 0xA4:
 				op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x9F];
-				comp = new Variable(Variable.STACK);
+				comp = stack.pop();
 				mid = new Variable();
 				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
 				break;
 			case 0xA5:
 			case 0xA6:
 				op = new String[] { "==", "!=" }[bytecode - 0xA5];
-				comp = new Variable(Variable.STACK);
+				comp = stack.pop();
 				mid = new Variable();
 				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
 				break;
@@ -81,10 +82,10 @@ public class GotoBytecodeParser extends BytecodeParser {
 				throw new IOException("subroutines are not supported.");
 		}
 			
-		if(op != null)out.add(new Instruction(op, Variable.STACK, comp, mid));
+		if(op != null)out.add(new Instruction(op, stack.pop(), comp, mid));
 			
 		if(location == Variable.END){
-			out.add(new Instruction("<return>", mid, location, Variable.STACK));
+			out.add(new Instruction("<return>", mid, location, stack.push(new Variable())));
 		}else{
 			out.add(new Instruction(Instruction.GOTO_INSTRUCTION, mid, location));
 		}

@@ -3,7 +3,6 @@ package com.github.fru.torsion.bytecode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.utils.CodeList;
 import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
@@ -26,7 +25,7 @@ public class BytecodeNormalization {
 
 		BytecodeNormalization.step2(method);
 		BytecodeNormalization.step3(method);
-		BytecodeNormalization.step4(method);
+		//BytecodeNormalization.step4(method);
 	}
 
 	private static void step1(CodeList<Instruction> method) {
@@ -147,7 +146,7 @@ public class BytecodeNormalization {
 		}
 	}
 
-	private static void step4(CodeList<Instruction> method) {
+	/*private static void step4(CodeList<Instruction> method) {
 		Stack<Variable> stack = new Stack<Variable>();
 		for (Instruction i : method) {
 			for (int input = 0; input < i.paramCount()-1; input++) {
@@ -162,5 +161,5 @@ public class BytecodeNormalization {
 				stack.push(i.getOp(-1));
 			}
 		}
-	}
+	}*/
 }

@@ -2,14 +2,16 @@ package com.github.fru.torsion.bytecode.map;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class UnsupportedBytecodeParser extends BytecodeParser{
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws IOException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException {
 		throw new RuntimeException("The Bytecode ["+Integer.toHexString(bytecode)+"] is not supported!");
 	}
 

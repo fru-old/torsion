@@ -136,10 +136,11 @@ public class ClassFile {
 		    CodeList<Instruction> code = new CodeList<Instruction>();
 		    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
 		    int startOffset = byteStream.getByteCount();
+		    Stack<Variable> stack = new Stack<Variable>();
 		    try{
 		    	while(true){
 		    		long offset = byteStream.getByteCount() - startOffset + 1;
-		    		List<Instruction> c = BytecodeParser.parse(byteStream, offset, constants);
+		    		List<Instruction> c = BytecodeParser.parse(byteStream, offset, constants, stack);
 		    		if(c!=null)code.addAll(c);
 		    	}
 		    }catch(EOFException exception){

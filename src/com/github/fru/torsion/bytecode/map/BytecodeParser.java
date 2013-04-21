@@ -3,14 +3,16 @@ package com.github.fru.torsion.bytecode.map;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public abstract class BytecodeParser {
 
-	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws IOException;
+	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException;
 	public abstract boolean isApplicable(int bytecode);
 	
 	
@@ -24,7 +26,7 @@ public abstract class BytecodeParser {
 	static UnsupportedBytecodeParser unsup = new UnsupportedBytecodeParser();
 	
 	
-	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants)
+	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants, Stack<Variable> stack)
 			throws IOException {
 		if(constant == null || constant.constants != constants)constant = new ConstantsBytecodeParser(constants);
 		if(invocation == null || invocation.constants != constants)invocation = new InvocationBytecodeParser(constants);
@@ -34,14 +36,14 @@ public abstract class BytecodeParser {
 		
 		int bytecode = byteStream.findNext();
 		
-		if(constant.isApplicable(bytecode))constant.parse(bytecode, byteStream, out);
-		else if(conversion.isApplicable(bytecode))conversion.parse(bytecode, byteStream, out);
-		else if(operation.isApplicable(bytecode))operation.parse(bytecode, byteStream, out);
-		else if(store.isApplicable(bytecode))store.parse(bytecode, byteStream, out);
-		else if(load.isApplicable(bytecode))load.parse(bytecode, byteStream, out);
-		else if(invocation.isApplicable(bytecode))invocation.parse(bytecode, byteStream, out);
-		else if(jump.isApplicable(bytecode))jump.parse(bytecode, byteStream, out);
-		else if(unsup.isApplicable(bytecode))unsup.parse(bytecode, byteStream, out);
+		if(constant.isApplicable(bytecode))constant.parse(bytecode, byteStream, out, stack);
+		else if(conversion.isApplicable(bytecode))conversion.parse(bytecode, byteStream, out, stack);
+		else if(operation.isApplicable(bytecode))operation.parse(bytecode, byteStream, out, stack);
+		else if(store.isApplicable(bytecode))store.parse(bytecode, byteStream, out, stack);
+		else if(load.isApplicable(bytecode))load.parse(bytecode, byteStream, out, stack);
+		else if(invocation.isApplicable(bytecode))invocation.parse(bytecode, byteStream, out, stack);
+		else if(jump.isApplicable(bytecode))jump.parse(bytecode, byteStream, out, stack);
+		else if(unsup.isApplicable(bytecode))unsup.parse(bytecode, byteStream, out, stack);
 		else{
 			System.out.println("Could not parse: "+bytecode);
 			
