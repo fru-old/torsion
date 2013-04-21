@@ -11,12 +11,9 @@ public class Main_ByteCode {
 		System.out.println(ClassFile.parse(A.class).toString());
 		
 		System.out.println("Not supported operations: \n");
-		for(int i = 0; i < 0xFF; i++){
+		for(int i = 0; i < 0xCA; i++){
 			if(!BytecodeParser.isBytecodeSupported(i))System.out.println(i);
 		}
-		
-		
-		System.out.println(new Object[]{"test"}.equals(new Object[]{"test"}));
 	}
 
 }

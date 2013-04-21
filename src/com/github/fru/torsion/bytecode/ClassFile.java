@@ -12,7 +12,7 @@ import com.github.fru.torsion.bytecode.map.BytecodeParser;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.CodeList;
 import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class ClassFile {
 
@@ -47,8 +47,8 @@ public class ClassFile {
 		for (int c = 1; c < constantPoolCount; c++) {
 			ClassFileConstant constant = ClassFileConstant.parse(reader);
 			constants.put(c, constant);
-			if (constant.getType() == ClassFileConstant.Type.Long
-					|| constant.getType() == ClassFileConstant.Type.Double) {
+			if (constant.getType() == ClassFileConstant.ClassFileConstantType.Long
+					|| constant.getType() == ClassFileConstant.ClassFileConstantType.Double) {
 				c++; // ick
 			}
 		}
@@ -208,9 +208,9 @@ public class ClassFile {
 		Stack<Instruction> stack = new Stack<Instruction>();
 		for(Instruction i : operations){
 			String tabs = "";for(int t = 0; t < stack.size(); t++)tabs+="\t";
-			if(i.getOperation().equals("start")){
+			if(i.getOperation().equals(Instruction.START_INSTRUCTION)){
 				stack.push(i);
-			}else if(i.getOperation().equals("end")){
+			}else if(i.getOperation().equals(Instruction.END_INSTRUCTION)){
 				if(tabs.length() > 0){
 					tabs = tabs.substring(1);
 					Instruction p = stack.pop();

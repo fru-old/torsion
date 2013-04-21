@@ -8,8 +8,8 @@ import java.util.Stack;
 import com.github.fru.torsion.bytecode.utils.CodeList;
 import com.github.fru.torsion.bytecode.utils.CodeList.Pointer;
 import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
 import com.github.fru.torsion.bytecode.utils.OrderStructure;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class BytecodeNormalization {
 
@@ -33,27 +33,25 @@ public class BytecodeNormalization {
 		HashMap<Variable, Pointer<Instruction>> lookup = new HashMap<Variable, Pointer<Instruction>>();
 		for (Pointer<Instruction> current : method.getPointer()) {
 			if (":".equals(current.getData().getOperation())) {
-				lookup.put(current.getData().getInputs()[0], current);
+				lookup.put(current.getData().getOp(0), current);
 			}
 		}
 		for (Pointer<Instruction> current : method.getPointer()) {
-			if ("goto".equals(current.getData().getOperation())) {
-				if (current.getData().getInputs() == null) continue;
-				if (current.getData().getInputs().length < 2) continue;
-				if (current.getData().getInputs()[1] == Variable.END) continue;
+			if (Instruction.GOTO_INSTRUCTION.equals(current.getData().getOperation())) {
+				if (current.getData().paramCount() < 2) continue;
+				if (current.getData().getOp(1) == Variable.END) continue;
 
-				Pointer<Instruction> label = lookup.get(current.getData().getInputs()[1]);
+				Pointer<Instruction> label = lookup.get(current.getData().getOp(1));
 				if (label == null) continue;
 				Variable identifier = new Variable();
-				current.getData().setOp(-1,identifier);
 				current.getData().clear();
 				Pointer<Instruction> newLabel;
-				if (method.indexOf(label.getData()) > method.indexOf(current.getData())) { // jump
-																							// forward
-					newLabel = label.addAfter(method, new Instruction("end",identifier));
-
-				} else { // jump backwards
-					newLabel = label.addAfter(method, new Instruction("start",identifier));
+				if (method.indexOf(label.getData()) > method.indexOf(current.getData())) { 
+					// jump forward
+					newLabel = label.addAfter(method, new Instruction(Instruction.END_INSTRUCTION,identifier));
+				} else { 
+					// jump backwards
+					newLabel = label.addAfter(method, new Instruction(Instruction.START_INSTRUCTION,identifier));
 				}
 				current.getData().setReference(newLabel);
 				newLabel.getData().setReference(current);
@@ -66,18 +64,18 @@ public class BytecodeNormalization {
 		for (Pointer<Instruction> istart : method.reversePointer()) {
 			order.add(istart);
 			Pointer<Instruction> igoto = istart.getData().getReference();
-			if (igoto != null && istart.getData().getOperation().equals("start") && igoto.getData().getOperation().equals("goto")) {
+			if (igoto != null && istart.getData().getOperation().equals(Instruction.START_INSTRUCTION) && igoto.getData().getOperation().equals(Instruction.GOTO_INSTRUCTION)) {
 				Pointer<Instruction> lastInteresting = igoto;
 				for (Pointer<Instruction> inbetweenStart : order.inbetween(igoto, istart)) {
-					if (inbetweenStart.getData().getOperation().equals("start")) { // &&
-																					// inbetweenStart.getData().getReference().getData().getOperation().equals("end")
+					if (inbetweenStart.getData().getOperation().equals(Instruction.START_INSTRUCTION)) { 
+						// && inbetweenStart.getData().getReference().getData().getOperation().equals("end")
 						Pointer<Instruction> inbetweeenEnd = inbetweenStart.getData().getReference();
 						if (order.isAfter(inbetweeenEnd, lastInteresting)) {
 							lastInteresting = inbetweeenEnd;
 						}
 					}
 				}
-				Pointer<Instruction> iend = lastInteresting.addAfter(method, new Instruction("end",istart.getData().getOp(-1)));
+				Pointer<Instruction> iend = lastInteresting.addAfter(method, new Instruction(Instruction.END_INSTRUCTION,istart.getData().getOp(-1)));
 				order.addAfter(lastInteresting, iend);
 				iend.getData().setReference(istart);
 				istart.getData().setReference(iend);
@@ -95,17 +93,17 @@ public class BytecodeNormalization {
 		for (Pointer<Instruction> iend : pointerClone) {
 			order.add(iend);
 			Pointer<Instruction> igoto = iend.getData().getReference();
-			if (iend.getData().getOperation().equals("end") && igoto.getData().getOperation().equals("goto")) {
+			if (iend.getData().getOperation().equals(Instruction.END_INSTRUCTION) && igoto.getData().getOperation().equals(Instruction.GOTO_INSTRUCTION)) {
 				Pointer<Instruction> lastInteresting = igoto;
 				ArrayList<Pointer<Instruction>> splitInteresting = new ArrayList<Pointer<Instruction>>();
 				for (Pointer<Instruction> inbetween : order.inbetween(igoto, iend)) {
-					if (inbetween.getData().getOperation().equals("end")) {
+					if (inbetween.getData().getOperation().equals(Instruction.END_INSTRUCTION)) {
 						Pointer<Instruction> inbetweenStart = inbetween.getData().getReference();
 						if (order.isAfter(inbetweenStart, lastInteresting)) {
 							lastInteresting = inbetweenStart;
 						}
 					}
-					if (inbetween.getData().getOperation().equals("start")) {
+					if (inbetween.getData().getOperation().equals(Instruction.START_INSTRUCTION)) {
 						splitInteresting.add(0, inbetween);
 					}
 				}
@@ -118,29 +116,29 @@ public class BytecodeNormalization {
 					Pointer<Instruction> splitEnd = splitStart.getData().getReference();
 					if (!order.isAfter(lastInteresting, splitEnd)) {
 
-						if (splitVariable == null && igoto.getData().getInputs().length > 0) {
+						if (splitVariable == null && igoto.getData().paramCount() > 0) {
 							splitVariable = new Variable();
 							iend.addAfter(method, new Instruction("=", "true", splitVariable));
-							igoto.addBefore(method, new Instruction("=", igoto.getData().getInputs()[0], splitVariable));
-							igoto.getData().getInputs()[0] = splitVariable;
+							igoto.addBefore(method, new Instruction("=", igoto.getData().getOp(0), splitVariable));
+							//igoto.getData().setOp(0, splitVariable);
 						}
 
-						Pointer<Instruction> newStart = splitStart.addAfter(method, new Instruction("start",close));
+						Pointer<Instruction> newStart = splitStart.addAfter(method, new Instruction(Instruction.START_INSTRUCTION,close));
 						iend.getData().setReference(newStart);
 						newStart.getData().setReference(iend);
 						order.addBefore(splitStart, newStart);
 
-						Pointer<Instruction> newGoto = newStart.addAfter(method, new Instruction("goto",close));
-						newGoto.getData().add("<pointer>",splitVariable);
+						Pointer<Instruction> newGoto = newStart.addAfter(method, new Instruction(Instruction.GOTO_INSTRUCTION/*,close*/));
+						//newGoto.getData().add("<pointer>",splitVariable);
 						newGoto.getData().setReference(iend);
 						order.addBefore(newStart, newGoto);
 
-						iend = splitStart.addBefore(method, new Instruction("end",close));
+						iend = splitStart.addBefore(method, new Instruction(Instruction.END_INSTRUCTION,close));
 						order.addAfter(splitStart, iend);
 					}
 				}
 
-				Pointer<Instruction> istart = lastInteresting.addBefore(method, new Instruction("start",close));
+				Pointer<Instruction> istart = lastInteresting.addBefore(method, new Instruction(Instruction.START_INSTRUCTION,close));
 				order.addAfter(lastInteresting, istart);
 				iend.getData().setReference(istart);
 				istart.getData().setReference(iend);
@@ -152,10 +150,10 @@ public class BytecodeNormalization {
 	private static void step4(CodeList<Instruction> method) {
 		Stack<Variable> stack = new Stack<Variable>();
 		for (Instruction i : method) {
-			for (int input = 0; input < i.getInputs().length; input++) {
-				if (i.getInputs()[input] != null && i.getInputs()[input].isStack()) {
+			for (int input = 0; input < i.paramCount()-1; input++) {
+				if (i.getOp(input) != null && i.getOp(input).isStack()) {
 					if (stack.size() > 0) {
-						i.getInputs()[input] = stack.pop();
+						i.setOp(input, stack.pop());
 					}
 				}
 			}

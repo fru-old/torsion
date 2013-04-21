@@ -15,9 +15,7 @@ public class UnsupportedBytecodeParser extends BytecodeParser{
 
 	@Override
 	public boolean isApplicable(int bytecode) {
-		if(bytecode >= 0xC9)return true;
 		if(bytecode == 0xC2 || bytecode == 0xC3)return true;
-		if(0xA8 <= bytecode && bytecode <= 0xAB)return true;
 		if(bytecode == 0xBA)return true;
 		return false;
 	}

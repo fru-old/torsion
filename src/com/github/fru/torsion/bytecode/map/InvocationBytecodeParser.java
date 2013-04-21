@@ -7,7 +7,7 @@ import java.util.Map;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class InvocationBytecodeParser extends BytecodeParser{
 	

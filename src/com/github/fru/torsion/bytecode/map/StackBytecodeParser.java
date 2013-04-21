@@ -5,7 +5,8 @@ import java.util.ArrayList;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.Type;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public abstract class StackBytecodeParser extends BytecodeParser{
 	
@@ -14,21 +15,21 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		
 		if(0x15 <= bytecode && bytecode <= 0x19){
 			int local = byteStream.findNext();
-			String type = Instruction.getType(bytecode-0x15);
+			Type type = Type.getType(bytecode-0x15);
 			producePrimitive(type, local, out);
 		}else if(0x1A <= bytecode && bytecode <= 0x2D ){
 			int local = (bytecode-0x1A) % 4;
-			String type = Instruction.getType((bytecode-0x1A) / 4);
+			Type type = Type.getType((bytecode-0x1A) / 4);
 			producePrimitive(type, local, out);
 		}else if(0x2E <= bytecode && bytecode <= 0x35){
-			String type = Instruction.getType(bytecode-0x2E);
+			Type type = Type.getType(bytecode-0x2E);
 			produceArray(type, out);
 		}
 	}
 	
 	protected abstract int normaizeBytecode(int bytecode);
-	protected abstract void producePrimitive(String type, int local, ArrayList<Instruction> out);
-	protected abstract void produceArray(String type, ArrayList<Instruction> out);
+	protected abstract void producePrimitive(Type type, int local, ArrayList<Instruction> out);
+	protected abstract void produceArray(Type type, ArrayList<Instruction> out);
 	
 	public static class Load extends StackBytecodeParser{
 		public boolean isApplicable(int bytecode){
@@ -36,16 +37,16 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		}
 		
 		@Override
-		protected void producePrimitive(String type, int local, ArrayList<Instruction> out) {
+		protected void producePrimitive(Type type, int local, ArrayList<Instruction> out) {
 			Instruction i = new Instruction("=", local,Variable.STACK);
 			i.setType(type);
 			out.add(i);
 		}
 
 		@Override
-		protected void produceArray(String type, ArrayList<Instruction> out) {
-			Instruction i = new Instruction("[]"+type, Variable.STACK, Variable.STACK,Variable.STACK);
-			i.setType(Instruction.reduceType(type), Instruction.REFERENCE_TYPE, Instruction.INTEGER_TYPE);
+		protected void produceArray(Type type, ArrayList<Instruction> out) {
+			Instruction i = new Instruction("[]", type, Variable.STACK, Variable.STACK,Variable.STACK);
+			i.setType(Type.reduceType(type), Type.REFERENCE_TYPE, Type.INTEGER_TYPE);
 			out.add(i);
 		}
 
@@ -61,16 +62,16 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		}
 		
 		@Override
-		protected void producePrimitive(String type, int local, ArrayList<Instruction> out) {
+		protected void producePrimitive(Type type, int local, ArrayList<Instruction> out) {
 			Instruction i = new Instruction("=", Variable.STACK,local);
 			i.setType(type);
 			out.add(i);
 		}
 
 		@Override
-		protected void produceArray(String type, ArrayList<Instruction> out) {
+		protected void produceArray(Type type, ArrayList<Instruction> out) {
 			Instruction i = new Instruction("[]", type, Variable.STACK, Variable.STACK, Variable.STACK,null);
-			i.setType(null, Instruction.REFERENCE_TYPE, Instruction.INTEGER_TYPE, Instruction.reduceType(type));
+			i.setType(null, Type.REFERENCE_TYPE, Type.INTEGER_TYPE, Type.reduceType(type));
 			out.add(i);
 		}
 

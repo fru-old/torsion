@@ -5,76 +5,77 @@ import java.util.ArrayList;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Instruction.Variable;
+import com.github.fru.torsion.bytecode.utils.Type;
+import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class ConversionBytecodeParser extends BytecodeParser{
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out) throws EOFException {
-		String fromType = null;
-		String toType = null;
+		Type fromType = null;
+		Type toType = null;
 		
 		switch(bytecode){
 		case 0x85:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.LONG_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.LONG_TYPE;
 			break;
 		case 0x86:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.FLOAT_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.FLOAT_TYPE;
 			break;
 		case 0x87:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.DOUBLE_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.DOUBLE_TYPE;
 			break;
 		case 0x88:
-			fromType = Instruction.LONG_TYPE;
-			toType = Instruction.INTEGER_TYPE;
+			fromType = Type.LONG_TYPE;
+			toType = Type.INTEGER_TYPE;
 			break;
 		case 0x89:
-			fromType = Instruction.LONG_TYPE;
-			toType = Instruction.FLOAT_TYPE;
+			fromType = Type.LONG_TYPE;
+			toType = Type.FLOAT_TYPE;
 			break;
 		case 0x8A:
-			fromType = Instruction.LONG_TYPE;
-			toType = Instruction.DOUBLE_TYPE;
+			fromType = Type.LONG_TYPE;
+			toType = Type.DOUBLE_TYPE;
 			break;
 		case 0x8B:
-			fromType = Instruction.FLOAT_TYPE;
-			toType = Instruction.INTEGER_TYPE;
+			fromType = Type.FLOAT_TYPE;
+			toType = Type.INTEGER_TYPE;
 			break;
 		case 0x8C:
-			fromType = Instruction.FLOAT_TYPE;
-			toType = Instruction.LONG_TYPE;
+			fromType = Type.FLOAT_TYPE;
+			toType = Type.LONG_TYPE;
 			break;
 		case 0x8D:
-			fromType = Instruction.FLOAT_TYPE;
-			toType = Instruction.DOUBLE_TYPE;
+			fromType = Type.FLOAT_TYPE;
+			toType = Type.DOUBLE_TYPE;
 			break;
 		case 0x8E:
-			fromType = Instruction.DOUBLE_TYPE;
-			toType = Instruction.INTEGER_TYPE;
+			fromType = Type.DOUBLE_TYPE;
+			toType = Type.INTEGER_TYPE;
 			break;
 		case 0x8F:
-			fromType = Instruction.DOUBLE_TYPE;
-			toType = Instruction.LONG_TYPE;
+			fromType = Type.DOUBLE_TYPE;
+			toType = Type.LONG_TYPE;
 			break;
 		case 0x90:
-			fromType = Instruction.DOUBLE_TYPE;
-			toType = Instruction.FLOAT_TYPE;
+			fromType = Type.DOUBLE_TYPE;
+			toType = Type.FLOAT_TYPE;
 			break;
 			
 		//smaller types	
 		case 0x91:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.BYTE_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.BYTE_TYPE;
 			break;
 		case 0x92:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.CHAR_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.CHAR_TYPE;
 			break;
 		case 0x93:
-			fromType = Instruction.INTEGER_TYPE;
-			toType = Instruction.SHORT_TYPE;
+			fromType = Type.INTEGER_TYPE;
+			toType = Type.SHORT_TYPE;
 			break;
 		}
 		

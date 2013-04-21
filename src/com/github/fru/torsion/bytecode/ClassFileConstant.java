@@ -8,7 +8,7 @@ import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 
 public class ClassFileConstant {
 
-	public static enum Type {
+	public static enum ClassFileConstantType {
 		String, Class, NameAndType, MethodRef, FieldRef, InterfaceMethodRef, Integer, Float, Long, Double, Utf8;
 	}
 
@@ -18,7 +18,7 @@ public class ClassFileConstant {
 
 	int ref2 = -1;
 
-	private Type type;
+	private ClassFileConstantType type;
 	
 	public String getConstant(){
 		return value;
@@ -41,11 +41,11 @@ public class ClassFileConstant {
 		this.ref2 = ref2;
 	}
 
-	public Type getType() {
+	public ClassFileConstantType getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(ClassFileConstantType type) {
 		this.type = type;
 	}
 
@@ -77,11 +77,11 @@ public class ClassFileConstant {
 
 	public static ClassFileConstant parse(ByteInputStream reader) throws IOException {
 		int byteType = reader.findNext();
-		ClassFileConstant.Type type = null;
+		ClassFileConstant.ClassFileConstantType type = null;
 		ClassFileConstant constant = null;
 		switch (byteType) {
 		case 1: // UTF-8
-			type = ClassFileConstant.Type.Utf8;
+			type = ClassFileConstant.ClassFileConstantType.Utf8;
 			byte[] bytes = new byte[reader.findShort()];
 			for (int i = 0; i < bytes.length; i++) {
 				bytes[i] = (byte) reader.findNext();
@@ -93,43 +93,43 @@ public class ClassFileConstant {
 			}
 			break;
 		case 3: // Integer
-			type = ClassFileConstant.Type.Integer;
+			type = ClassFileConstant.ClassFileConstantType.Integer;
 			constant = new ClassFileConstant("" + reader.findInt());
 			break;
 		case 4: // Float
-			type = ClassFileConstant.Type.Float;
+			type = ClassFileConstant.ClassFileConstantType.Float;
 			constant = new ClassFileConstant("" + Float.intBitsToFloat(reader.findInt()));
 			break;
 		case 5: // Long
-			type = ClassFileConstant.Type.Long;
+			type = ClassFileConstant.ClassFileConstantType.Long;
 			constant = new ClassFileConstant("" + reader.findLong());
 			break;
 		case 6: // Double
-			type = ClassFileConstant.Type.Double;
+			type = ClassFileConstant.ClassFileConstantType.Double;
 			constant = new ClassFileConstant("" + Double.longBitsToDouble(reader.findLong()));
 			break;
 		case 9: // FieldRef
-			type = ClassFileConstant.Type.FieldRef;
+			type = ClassFileConstant.ClassFileConstantType.FieldRef;
 			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 10: // MethodRef
-			type = ClassFileConstant.Type.MethodRef;
+			type = ClassFileConstant.ClassFileConstantType.MethodRef;
 			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 11: // InterfaceMethodRef
-			type = ClassFileConstant.Type.InterfaceMethodRef;
+			type = ClassFileConstant.ClassFileConstantType.InterfaceMethodRef;
 			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 12: // NameAndType
-			type = ClassFileConstant.Type.NameAndType;
+			type = ClassFileConstant.ClassFileConstantType.NameAndType;
 			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
 			break;
 		case 7: // Class
-			type = ClassFileConstant.Type.Class;
+			type = ClassFileConstant.ClassFileConstantType.Class;
 			constant = new ClassFileConstant(reader.findShort());
 			break;
 		case 8: // String
-			type = ClassFileConstant.Type.String;
+			type = ClassFileConstant.ClassFileConstantType.String;
 			constant = new ClassFileConstant(reader.findShort());
 			break;
 		default:
