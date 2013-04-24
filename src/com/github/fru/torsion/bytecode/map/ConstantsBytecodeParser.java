@@ -26,7 +26,7 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 		String constant = null;
 		
 		if(bytecode == 0x01){
-			type = Type.REFERENCE_TYPE;
+			type = Type.NULL_TYPE;
 			constant = "null";
 		}else if(0x02 <= bytecode && bytecode <= 0x08 ){
 			type = Type.INTEGER_TYPE;

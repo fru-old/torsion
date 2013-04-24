@@ -150,7 +150,6 @@ public class ClassFile {
 		    	System.exit(-1);
 		    }
 		    
-		    Variable.offsetCounter(maxLocal);
 		    BytecodeNormalization.normalize(code);
 		    methodsInstructions.add(code);
 		    

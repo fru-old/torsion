@@ -47,7 +47,7 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		@Override
 		protected void produceArray(Type type, ArrayList<Instruction> out, Stack<Variable> stack) {
 			Instruction i = new Instruction("[]", type, stack.pop(), stack.pop(), stack.push(new Variable()));
-			i.setType(Type.reduceType(type), Type.REFERENCE_TYPE, Type.INTEGER_TYPE);
+			i.setType(Type.reduceType(type), Type.NULL_TYPE, Type.INTEGER_TYPE);
 			out.add(i);
 		}
 
@@ -72,7 +72,7 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		@Override
 		protected void produceArray(Type type, ArrayList<Instruction> out, Stack<Variable> stack) {
 			Instruction i = new Instruction("[]", type, stack.pop(), stack.pop(), stack.pop(), null);
-			i.setType(null, Type.REFERENCE_TYPE, Type.INTEGER_TYPE, Type.reduceType(type));
+			i.setType(null, Type.NULL_TYPE, Type.INTEGER_TYPE, Type.reduceType(type));
 			out.add(i);
 		}
 

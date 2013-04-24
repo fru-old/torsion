@@ -38,7 +38,6 @@ public class BytecodeNormalization {
 		for (Pointer<Instruction> current : method.getPointer()) {
 			if (Instruction.GOTO_INSTRUCTION.equals(current.getData().getOperation())) {
 				if (current.getData().paramCount() < 2) continue;
-				if (current.getData().getOp(1) == Variable.END) continue;
 
 				Pointer<Instruction> label = lookup.get(current.getData().getOp(1));
 				if (label == null) continue;

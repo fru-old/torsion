@@ -4,8 +4,6 @@ import com.github.fru.torsion.bytecode.utils.Instruction.VariableType;
 
 public class Variable {
 
-	public static final Variable END = new Variable();
-
 	private Object value;
 
 	public Variable(Object value) {
@@ -19,22 +17,25 @@ public class Variable {
 		return vins;
 	}
 
-	static int counter = 0;
+	static int counter = 5000;
 
 	public Variable() {
 		this(counter++);
-	}
-	
-	public static void offsetCounter(int count){
-		counter += count;
 	}
 
 	public Object getValue() {
 		return this.value;
 	}
 
+	
+	
+	
+	/*
+	 * Variable types local actual type 
+	 */
+	
+	
 	public VariableType getType() {
-		if (value == END) return VariableType.LOCATION;
 		if (value instanceof Long) return VariableType.LOCATION;
 		if (value instanceof Integer) return VariableType.LOCAL;
 		if (value instanceof String) return VariableType.CONSTANT;
@@ -44,7 +45,6 @@ public class Variable {
 	@Override
 	public String toString() {
 		VariableType type = getType();
-		if (this == Variable.END) return "LOCATION end";
 		if (type == VariableType.CONSTANT) return "CONST " + value;
 		if (type == VariableType.LOCAL) return ""+ value;
 		if (type == VariableType.LOCATION) return "LOCATION " + value;

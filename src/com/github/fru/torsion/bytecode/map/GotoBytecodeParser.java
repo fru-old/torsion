@@ -62,11 +62,11 @@ public class GotoBytecodeParser extends BytecodeParser {
 			case 0xAF:
 			case 0xB0:
 				mid = new Variable("true");
-				location = Variable.END;
+				location = null;
 				break;
 			case 0xB1:
 				mid = new Variable("true");
-				location = Variable.END;
+				location = null;
 				break;
 			case 0xC6:
 			case 0xC7:
@@ -84,8 +84,8 @@ public class GotoBytecodeParser extends BytecodeParser {
 			
 		if(op != null)out.add(new Instruction(op, stack.pop(), comp, mid));
 			
-		if(location == Variable.END){
-			out.add(new Instruction("<return>", mid, location, stack.push(new Variable())));
+		if(location == null){
+			out.add(new Instruction("<return>", mid, stack.push(new Variable())));
 		}else{
 			out.add(new Instruction(Instruction.GOTO_INSTRUCTION, mid, location));
 		}
