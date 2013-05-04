@@ -21,43 +21,32 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 	}
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
-		Type type = null;
-		String constant = null;
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException {
+		Variable<?> constant = null;
 		
 		if(bytecode == 0x01){
-			type = Type.NULL_TYPE;
-			constant = "null";
+			constant = new Variable<Object>(null, Type.NULL);
 		}else if(0x02 <= bytecode && bytecode <= 0x08 ){
-			type = Type.INTEGER_TYPE;
-			constant = ""+(bytecode-0x03);
+			constant = new Variable<Integer>(bytecode-0x03, Type.INTEGER);
 		}else if(bytecode == 0x09 || bytecode == 0x0A){
-			type = Type.LONG_TYPE;
-			constant = ""+(bytecode - 0x09);
+			constant = new Variable<Long>((long)bytecode-0x09, Type.LONG);
 		}else if(0x0B <= bytecode && bytecode <= 0x0D ){
-			type = Type.FLOAT_TYPE;
-			constant = ""+(bytecode-0x0B);
+			constant = new Variable<Float>((float)bytecode-0x0B, Type.FLOAT);
 		}else if(bytecode == 0x0E || bytecode == 0x0F){
-			type = Type.DOUBLE_TYPE;
-			constant = ""+(bytecode - 0x09);
+			constant = new Variable<Double>((double)bytecode-0x0E, Type.DOUBLE);
 		}else if(bytecode == 0x10){
-			type = Type.INTEGER_TYPE;
-			constant = ""+byteStream.findNext();
+			constant = new Variable<Integer>(byteStream.findNext(), Type.INTEGER);
 		}else if(bytecode == 0x11){
-			type = Type.INTEGER_TYPE;
-			constant = ""+byteStream.findShort();
+			constant = new Variable<Integer>(byteStream.findShort(), Type.INTEGER);
 		}else if(bytecode == 0x12){
 			int location = byteStream.findNext();
-			type = Type.getConstantType(location, constants);
-			constant = getConstant(location);
+			constant = new Variable<String>(getConstant(location),Type.getConstantType(location, constants));
 		}else if(bytecode == 0x13 || bytecode == 0x14){
 			int location = byteStream.findShort();
-			type = Type.getConstantType(location, constants);
-			constant = getConstant(location);
+			constant = new Variable<String>(getConstant(location),Type.getConstantType(location, constants));
 		}
 		
-		Instruction i = new Instruction("=",constant,stack.push(new Variable()));
-		i.setType(type);
+		Instruction i = new Instruction("=").add(constant).add(stack.push(new Variable.Default(constant.getType())));
 		out.add(i);
 	}
 	
@@ -65,7 +54,7 @@ public class ConstantsBytecodeParser extends BytecodeParser {
 		ClassFileConstant constant = constants.get(index);
 		String out = constant.getConstant();
 		if(constant.getType() == ClassFileConstantType.String){
-			out = "\""+constants.get(constant.getRef1()).getConstant()+"\"";
+			out = constants.get(constant.getRef1()).getConstant();
 		} 
 		return out;
 	}

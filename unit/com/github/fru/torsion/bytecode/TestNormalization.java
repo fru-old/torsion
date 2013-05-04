@@ -19,8 +19,8 @@ public class TestNormalization {
 		int size = 5;
 		
 		for(int i = 0; i < size; i++){
-			randomJumps.add(new Instruction( ":", i, null));
-			randomJumps.add(new Instruction("goto",null,random.nextInt(size)));
+			//randomJumps.add(new Instruction( ":", i, null));
+			//randomJumps.add(new Instruction("goto",null,random.nextInt(size)));
 		}
 		
 		System.out.println(randomJumps.toString());

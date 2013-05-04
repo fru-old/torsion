@@ -11,7 +11,7 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 public class UnsupportedBytecodeParser extends BytecodeParser{
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException {
 		throw new RuntimeException("The Bytecode ["+Integer.toHexString(bytecode)+"] is not supported!");
 	}
 

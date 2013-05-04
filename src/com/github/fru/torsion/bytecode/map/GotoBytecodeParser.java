@@ -6,15 +6,16 @@ import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class GotoBytecodeParser extends BytecodeParser {
 
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException{
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException{
 		String op = null;
-		Variable mid = null;
-		Variable comp = null;
-		Variable location = null;
+		Variable<?> mid = null;
+		Variable<?> comp = null;
+		Variable<?> location = null;
 		
 		switch(bytecode){
 			case 0x99:
@@ -24,9 +25,9 @@ public class GotoBytecodeParser extends BytecodeParser {
 			case 0x9D:
 			case 0x9E:
 				op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x99];
-				comp = new Variable(0);
-				mid = new Variable();
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
+				comp = new Variable<Integer>(0,Type.INTEGER);
+				mid = new Variable.Default(Type.BOOLEAN);
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findShort()),Type.LOCATION);
 				break;
 			case 0x9F:
 			case 0xA0:
@@ -36,19 +37,20 @@ public class GotoBytecodeParser extends BytecodeParser {
 			case 0xA4:
 				op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x9F];
 				comp = stack.pop();
-				mid = new Variable();
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
+				mid = new Variable.Default(Type.BOOLEAN);
+				
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findShort()),Type.LOCATION);
 				break;
 			case 0xA5:
 			case 0xA6:
 				op = new String[] { "==", "!=" }[bytecode - 0xA5];
 				comp = stack.pop();
-				mid = new Variable();
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
+				mid = new Variable.Default(Type.BOOLEAN);
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findShort()),Type.LOCATION);
 				break;
 			case 0xA7:
-				mid = new Variable("true");
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
+				mid = new Variable<Boolean>(true,Type.BOOLEAN);
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findShort()),Type.LOCATION);
 				break;
 			case 0xA8:
 			case 0xA9:
@@ -61,36 +63,34 @@ public class GotoBytecodeParser extends BytecodeParser {
 			case 0xAE:
 			case 0xAF:
 			case 0xB0:
-				mid = new Variable("true");
+				mid = new Variable<Boolean>(true,Type.BOOLEAN);
 				location = null;
 				break;
 			case 0xB1:
-				mid = new Variable("true");
+				mid = new Variable<Boolean>(true,Type.BOOLEAN);
 				location = null;
 				break;
 			case 0xC6:
 			case 0xC7:
 				op = new String[] { "==", "!=" }[bytecode - 0xC7];
-				comp = new Variable("null");
-				mid = new Variable();
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findShort()));
+				comp = new Variable<Object>(null, Type.NULL);
+				mid = new Variable.Default(Type.BOOLEAN);
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findShort()),Type.LOCATION);
 				break;
 			case 0xC8:
-				mid = new Variable("true");
-				location = new Variable((long)(byteStream.getByteCount() + (short) byteStream.findInt()));
+				mid = new Variable<Boolean>(true,Type.BOOLEAN);
+				location = new Variable<Long>((long)(byteStream.getByteCount() + (short) byteStream.findInt()),Type.LOCATION);
 			case 0xC9:
 				throw new IOException("subroutines are not supported.");
 		}
 			
-		if(op != null)out.add(new Instruction(op, stack.pop(), comp, mid));
+		if(op != null)out.add(new Instruction(op).add(stack.pop()).add(comp).add(mid));
 			
 		if(location == null){
-			out.add(new Instruction("<return>", mid, stack.push(new Variable())));
+			out.add(new Instruction("<return>").add(mid).add(stack.pop()));
 		}else{
-			out.add(new Instruction(Instruction.GOTO_INSTRUCTION, mid, location));
+			out.add(new Instruction(Instruction.GOTO_INSTRUCTION).add(mid).add(location));
 		}
-		
-		//TODO: Add type information
 	}
 	
 	

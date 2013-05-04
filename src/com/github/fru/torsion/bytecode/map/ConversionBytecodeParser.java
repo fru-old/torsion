@@ -11,77 +11,77 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class ConversionBytecodeParser extends BytecodeParser{
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException {
+		@SuppressWarnings("unused")
 		Type fromType = null;
 		Type toType = null;
 		
 		switch(bytecode){
 		case 0x85:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.LONG_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.LONG;
 			break;
 		case 0x86:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.FLOAT_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.FLOAT;
 			break;
 		case 0x87:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.DOUBLE_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.DOUBLE;
 			break;
 		case 0x88:
-			fromType = Type.LONG_TYPE;
-			toType = Type.INTEGER_TYPE;
+			fromType = Type.LONG;
+			toType = Type.INTEGER;
 			break;
 		case 0x89:
-			fromType = Type.LONG_TYPE;
-			toType = Type.FLOAT_TYPE;
+			fromType = Type.LONG;
+			toType = Type.FLOAT;
 			break;
 		case 0x8A:
-			fromType = Type.LONG_TYPE;
-			toType = Type.DOUBLE_TYPE;
+			fromType = Type.LONG;
+			toType = Type.DOUBLE;
 			break;
 		case 0x8B:
-			fromType = Type.FLOAT_TYPE;
-			toType = Type.INTEGER_TYPE;
+			fromType = Type.FLOAT;
+			toType = Type.INTEGER;
 			break;
 		case 0x8C:
-			fromType = Type.FLOAT_TYPE;
-			toType = Type.LONG_TYPE;
+			fromType = Type.FLOAT;
+			toType = Type.LONG;
 			break;
 		case 0x8D:
-			fromType = Type.FLOAT_TYPE;
-			toType = Type.DOUBLE_TYPE;
+			fromType = Type.FLOAT;
+			toType = Type.DOUBLE;
 			break;
 		case 0x8E:
-			fromType = Type.DOUBLE_TYPE;
-			toType = Type.INTEGER_TYPE;
+			fromType = Type.DOUBLE;
+			toType = Type.INTEGER;
 			break;
 		case 0x8F:
-			fromType = Type.DOUBLE_TYPE;
-			toType = Type.LONG_TYPE;
+			fromType = Type.DOUBLE;
+			toType = Type.LONG;
 			break;
 		case 0x90:
-			fromType = Type.DOUBLE_TYPE;
-			toType = Type.FLOAT_TYPE;
+			fromType = Type.DOUBLE;
+			toType = Type.FLOAT;
 			break;
 			
 		//smaller types	
 		case 0x91:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.BYTE_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.BYTE;
 			break;
 		case 0x92:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.CHAR_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.CHAR;
 			break;
 		case 0x93:
-			fromType = Type.INTEGER_TYPE;
-			toType = Type.SHORT_TYPE;
+			fromType = Type.INTEGER;
+			toType = Type.SHORT;
 			break;
 		}
 		
-		Instruction i = new Instruction("()",toType,stack.pop(),stack.push(new Variable()));
-		i.setType(toType, fromType);
+		Instruction i = new Instruction("()").add(new Variable<Type>(toType,Type.TYPE)).add(stack.pop()).add(stack.push(new Variable.Default(toType)));
 		out.add(i);
 	}
 

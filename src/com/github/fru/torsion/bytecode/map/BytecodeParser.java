@@ -8,11 +8,12 @@ import java.util.Stack;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
 public abstract class BytecodeParser {
 
-	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws IOException;
+	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException;
 	public abstract boolean isApplicable(int bytecode);
 	
 	
@@ -26,13 +27,13 @@ public abstract class BytecodeParser {
 	static UnsupportedBytecodeParser unsup = new UnsupportedBytecodeParser();
 	
 	
-	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants, Stack<Variable> stack)
+	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants, Stack<Variable<?>> stack)
 			throws IOException {
 		if(constant == null || constant.constants != constants)constant = new ConstantsBytecodeParser(constants);
 		if(invocation == null || invocation.constants != constants)invocation = new InvocationBytecodeParser(constants);
 		
 		ArrayList<Instruction> out = new ArrayList<Instruction>();
-		out.add(new Instruction(":", offset, null));
+		out.add(new Instruction(":").add(new Variable<Long>(offset,Type.LOCATION)));
 		
 		int bytecode = byteStream.findNext();
 		

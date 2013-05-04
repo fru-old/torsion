@@ -8,6 +8,7 @@ import java.util.Stack;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
+import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class InvocationBytecodeParser extends BytecodeParser{
@@ -19,12 +20,15 @@ public class InvocationBytecodeParser extends BytecodeParser{
 	}
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable> stack) throws EOFException {
-		ClassFileConstant constant = constants.get(byteStream.findShort());
+	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException {
+		Variable<ClassFileConstant> constant = new Variable<ClassFileConstant>(constants.get(byteStream.findShort()),Type.REFERENCE);
 		
+		//TODO find type
+		
+		/*
 		switch(bytecode){
 		case 0xB2:
-			out.add(new Instruction("=static",constant,stack.push(new Variable())));
+			out.add(new Instruction("=static").add(constant).add(stack.push(new Variable())));
 			break;
 		case 0xB3:
 			out.add(new Instruction("=static",stack.pop(),constant));
@@ -55,7 +59,7 @@ public class InvocationBytecodeParser extends BytecodeParser{
 			byteStream.findShort();
 			out.add(new Instruction("invokedynamic",constant,stack.push(new Variable())));
 			break;
-		}
+		}*/
 		//TODO: Invocation need to parse types, to get operand count
 	}
 

@@ -136,7 +136,7 @@ public class ClassFile {
 		    CodeList<Instruction> code = new CodeList<Instruction>();
 		    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
 		    int startOffset = byteStream.getByteCount();
-		    Stack<Variable> stack = new Stack<Variable>();
+		    Stack<Variable<?>> stack = new Stack<Variable<?>>();
 		    try{
 		    	while(true){
 		    		long offset = byteStream.getByteCount() - startOffset + 1;
@@ -214,8 +214,8 @@ public class ClassFile {
 				if(tabs.length() > 0){
 					tabs = tabs.substring(1);
 					Instruction p = stack.pop();
-					if(!i.getOp(-1).equals(p.getOp(-1))){
-						throw new RuntimeException();
+					if(!i.getParam(-1).equals(p.getParam(-1))){
+						//throw new RuntimeException();
 					}
 					
 				}
