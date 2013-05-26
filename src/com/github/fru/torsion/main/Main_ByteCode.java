@@ -8,11 +8,11 @@ import com.github.fru.torsion.bytecode.map.BytecodeParser;
 public class Main_ByteCode {
 
 	public static void main(String... args) throws IOException {
-		System.out.println(ClassFile.parse(A.class).toString());
+		System.out.println(ClassFile.parse(B.class).toString());
 		
-		System.out.println("Not supported operations: \n");
+		//System.out.println("Not supported operations: \n");
 		for(int i = 0; i < 0xCA; i++){
-			if(!BytecodeParser.isBytecodeSupported(i))System.out.println(i);
+			//if(!BytecodeParser.isBytecodeSupported(i))System.out.println(i);
 		}
 	}
 

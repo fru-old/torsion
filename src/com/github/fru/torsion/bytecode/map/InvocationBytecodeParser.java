@@ -25,41 +25,44 @@ public class InvocationBytecodeParser extends BytecodeParser{
 		
 		//TODO find type
 		
-		/*
+		
 		switch(bytecode){
 		case 0xB2:
-			out.add(new Instruction("=static").add(constant).add(stack.push(new Variable())));
+			//out.add(new Instruction("=static").add(constant).add(stack.push(new Variable())));
 			break;
 		case 0xB3:
-			out.add(new Instruction("=static",stack.pop(),constant));
+			System.out.println("static "+constant);
+			//out.add(new Instruction("=static",stack.pop(),constant));
 			break;
 		case 0xB4:
-			out.add(new Instruction("=field",constant,stack.push(new Variable())));
+			//out.add(new Instruction("=field",constant,stack.push(new Variable())));
 			break;
 		case 0xB5:
-			out.add(new Instruction("=field",stack.pop(),constant));
+			//out.add(new Instruction("=field",stack.pop(),constant));
 			break;
 		}
 		
 		switch(bytecode){
 		case 0xB6:
-			out.add(new Instruction("invokevirtual",constant,stack.pop(),stack.push(new Variable())));
+			System.out.println("invokevirtual "+constant);
+			//out.add(new Instruction("invokevirtual",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xB7:
-			out.add(new Instruction("invokespecial",constant,stack.pop(),stack.push(new Variable())));
+			//out.add(new Instruction("invokespecial",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xB8:
-			out.add(new Instruction("invokestatic",constant,stack.push(new Variable())));
+			//out.add(new Instruction("invokestatic",constant,stack.push(new Variable())));
 			break;
 		case 0xB9:
 			byteStream.findShort();
-			out.add(new Instruction("invokeinterface",constant,stack.pop(),stack.push(new Variable())));
+			//out.add(new Instruction("invokeinterface",constant,stack.pop(),stack.push(new Variable())));
 			break;
 		case 0xBA:
 			byteStream.findShort();
-			out.add(new Instruction("invokedynamic",constant,stack.push(new Variable())));
+			System.out.println("invokedynamic " + constant);
+			//out.add(new Instruction("invokedynamic").add(constant).add(stack.push(new Variable())));
 			break;
-		}*/
+		}
 		//TODO: Invocation need to parse types, to get operand count
 	}
 
