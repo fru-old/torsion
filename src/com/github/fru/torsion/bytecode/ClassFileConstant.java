@@ -25,6 +25,10 @@ public class ClassFileConstant {
 	public int getRef1(){
 		return ref1;
 	}
+	
+	public int getRef2(){
+		return ref2;
+	}
 
 	private ClassFileConstant(String value) {
 		this.value = value;

@@ -1,7 +1,6 @@
 package com.github.fru.torsion.bytecode.normalization;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,12 +9,24 @@ import com.github.fru.torsion.main.B;
 
 public class Identifier {
 	
-	public static Method parseMethodConstant(int name, int type, Class<?> clazz, HashMap<Integer, ClassFileConstant> constants){
-		Method out;
-		
-		return out;
+	public static AccessibleObject parseMethodConstant(int name, int type, Class<?> clazz, HashMap<Integer, ClassFileConstant> constants){
+		try{
+			ClassFileConstant n = constants.get(name);
+			ClassFileConstant t = constants.get(type);
+			return parseMethod(n.getConstant(), clazz, parseMethodSignatureConstant(t.getConstant()));
+		}catch(Exception e){
+			return null;
+		}
 	}
 
+	public static AccessibleObject parseMethod(String name, Class<?> clazz, Class<?>[] signature) throws NoSuchMethodException, SecurityException{
+		if(name.equals("<init>")){
+			return clazz.getConstructor(signature);
+		}else{
+			return clazz.getMethod(name, signature);
+		}
+	}
+	
 	public static Class<?>[] parseMethodSignatureConstant(String constant) {
 		ArrayList<Class<?>> out = new ArrayList<Class<?>>();
 		char first = constant.charAt(0);
@@ -55,20 +66,12 @@ public class Identifier {
 		}
 	}
 	
-	public static enum Type{
-		METHOD, FIELD, ID
-	}
-	
-	public final Type type;
-	public final Method method;
-	public final Field field;
+	public final AccessibleObject accessible;
 	public final Object id;
 	
 	public Identifier(String name, Class<?> clazz, String signature){
 		try{
-			this.type = Type.METHOD;
-			this.method = clazz.getMethod(name, parseMethodSignatureConstant(signature));
-			this.field = null;
+			this.accessible = parseMethod(name, clazz, parseMethodSignatureConstant(signature));
 			this.id = null;
 		}catch(Exception exception){
 			throw new RuntimeException(exception);
@@ -77,9 +80,7 @@ public class Identifier {
 	
 	public Identifier(String name, Class<?> clazz){
 		try{
-			this.type = Type.FIELD;
-			this.method = null;
-			this.field = clazz.getDeclaredField(name);
+			this.accessible = clazz.getDeclaredField(name);
 			this.id = null;
 		}catch(Exception exception){
 			throw new RuntimeException(exception);
@@ -87,9 +88,7 @@ public class Identifier {
 	}
 	
 	public Identifier(Object object){
-		this.type = Type.ID;
-		this.method = null;
-		this.field = null;
+		this.accessible = null;
 		this.id = object;
 	}
 	
@@ -101,15 +100,21 @@ public class Identifier {
 	public boolean equals(Object o){
 		if(!(o instanceof Identifier))return false;
 		Identifier other = (Identifier)o;
-		return this.field == other.field && this.id == other.id && this.method == other.method;
+		return this.accessible == other.accessible && this.id == other.id;
 	}
 	
 	@Override
 	public int hashCode(){
-		if(this.field != null)return this.field.hashCode();
-		if(this.method != null)return this.method.hashCode();
+		if(this.accessible != null)return this.accessible.hashCode();
 		if(this.id != null)return this.id.hashCode();
 		return this.hashCode();
+	}
+	
+	@Override
+	public String toString(){
+		if(this.accessible != null)return this.accessible.toString();
+		if(this.id != null)return this.id.toString();
+		return this.toString();
 	}
 	
 	//Normalization: Operation StackAssignment
@@ -120,7 +125,5 @@ public class Identifier {
 		System.out.println(Class.forName("java.lang.Integer").getMethod("toString", parseMethodSignatureConstant("()Ljava/lang/String;")));
 		System.out.println(B.class.getMethod("test", parseMethodSignatureConstant("(Ljava/lang/Object;Ljava/lang/Object;II)Ljava/lang/String;")));
 		System.out.println(B.class.getDeclaredField("a"));
-		// 
-
 	}
 }

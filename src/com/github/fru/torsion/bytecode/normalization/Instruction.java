@@ -1,14 +1,41 @@
 package com.github.fru.torsion.bytecode.normalization;
 
+import java.util.ArrayList;
+
 public class Instruction {
 
 	public final int location;
+	public final String operation;
+	
 	public Instruction(int location){
-		this.location = location;
+		this(location,"=");
 	}
 	
+	public Instruction(int location, String operation){
+		this.location = location;
+		this.operation = operation;
+	}
+	
+	private final ArrayList<Identifier> parameter = new ArrayList<Identifier>();
+	
 	public String toString(){
+		if(parameter.size() > 0){
+			StringBuilder out = new StringBuilder();
+			out.append(operation);
+			out.append("( ");
+			for(Identifier id : parameter){
+				out.append(id.toString());
+				out.append(", ");
+			}
+			out.append(")");
+			return out.toString();
+		}
 		return "NOOP "+location;
+	}
+	
+	public Instruction add(Identifier identfier){
+		parameter.add(identfier);
+		return this;
 	}
 	
 	public static class Jump extends Instruction {

@@ -2,7 +2,7 @@ package com.github.fru.torsion.bytecode;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.AccessibleObject;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.normalization.Identifier;
@@ -10,16 +10,16 @@ import com.github.fru.torsion.bytecode.normalization.MethodBody;
 
 public class ClassFile {
 	
-	public static HashMap<Method,MethodBody> parse(Class<?> c) throws IOException {
+	public static HashMap<AccessibleObject,MethodBody> parse(Class<?> c) throws IOException {
 		return new ClassFile().parse(new ByteInputStream(Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(c.getName().replace('.', '/') + ".class")),c);
 	}
 
-	HashMap<Method,MethodBody> result = new HashMap<Method, MethodBody>(); 
-	HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
+	final HashMap<AccessibleObject,MethodBody> result = new HashMap<AccessibleObject, MethodBody>(); 
+	final HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
 
 	@SuppressWarnings("unused")
-	private HashMap<Method,MethodBody> parse(ByteInputStream reader, Class<?> clazz) throws IOException {
+	private HashMap<AccessibleObject,MethodBody> parse(ByteInputStream reader, Class<?> clazz) throws IOException {
 		// PARSE: Magic number
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };
 
@@ -36,7 +36,6 @@ public class ClassFile {
 
 		// PARSE: Constant table
 		int constantPoolCount = reader.findShort();
-		HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
 
 		for (int c = 1; c < constantPoolCount; c++) {
 			ClassFileConstant constant = ClassFileConstant.parse(reader);
@@ -67,7 +66,7 @@ public class ClassFile {
 			fieldsFlag[i] = reader.findShort();
 			fieldsName[i] = reader.findShort();
 			fieldsType[i] = reader.findShort();
-			findAttributes(reader,null);
+			findAttributes(reader,null,clazz);
 		}
 
 		// PARSE: Methods
@@ -79,12 +78,12 @@ public class ClassFile {
 			methodsFlag[i] = reader.findShort();
 			methodsName[i] = reader.findShort();
 			methodsType[i] = reader.findShort();
-			Method method = Identifier.parseMethodConstant(methodsName[i], methodsType[i], clazz, constants);
-			findAttributes(reader,method);
+			AccessibleObject method = Identifier.parseMethodConstant(methodsName[i], methodsType[i], clazz, constants);
+			findAttributes(reader,method,clazz);
 		}
 
 		// PARSE: Info
-		findAttributes(reader, null);
+		findAttributes(reader, null, clazz);
 
 		if (reader.getInput().read() != -1) { // The end should be reached
 			throw new IOException("Expected end of file at "+reader.getPosition());
@@ -92,23 +91,23 @@ public class ClassFile {
 		return result;
 	}
 
-	private void findAttributes(ByteInputStream reader, Method current) throws IOException {
+	private void findAttributes(ByteInputStream reader, AccessibleObject current, Class<?> clazz) throws IOException {
 		int attributeCount = reader.findShort();
 		for (int i = 0; i < attributeCount; i++) {
 			int name = reader.findShort();
 			int size = reader.findInt(); // attribute length
-			parseAttribute(new ByteInputStream(reader, size), constants.get(name).value, current);
+			parseAttribute(new ByteInputStream(reader, size), constants.get(name).value, current, clazz);
 		}
 	}
 
 	@SuppressWarnings("unused")
-	private void parseAttribute(ByteInputStream reader, String name, Method current) throws IOException {
+	private void parseAttribute(ByteInputStream reader, String name, AccessibleObject current, Class<?> clazz) throws IOException {
 		if("code".equalsIgnoreCase(name)){
 			int maxStack = reader.findShort();
 		    int maxLocal = reader.findShort();
 		    
 		    MethodBody body = new MethodBody();
-		    body.parseBody(reader, constants);
+		    body.parseBody(reader, constants, clazz);
 		    
 		    result.put(current, body);
 		    
@@ -122,7 +121,7 @@ public class ClassFile {
 		      else System.out.println(String.format( "Handle exception [%s] from [%s] to [%s] then jump to [%S]", exception,from,to,jump ));
 		    }
 
-		    findAttributes( reader, current );
+		    findAttributes( reader, current, clazz);
 		}else{
 			try {
 				while (true)

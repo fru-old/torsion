@@ -15,8 +15,8 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public abstract class StackOperation extends MethodBody.AbstractParser{
 	
-	public StackOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
-		super(stack,constants,body);
+	public StackOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
+		super(stack,constants,body,clazz);
 	}
 	
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, StackOperation<Variable<?>> stack) throws EOFException{

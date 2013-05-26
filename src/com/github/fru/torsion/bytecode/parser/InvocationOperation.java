@@ -3,7 +3,6 @@ package com.github.fru.torsion.bytecode.parser;
 import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ByteInputStream;
@@ -11,28 +10,30 @@ import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
 import com.github.fru.torsion.bytecode.normalization.MethodBody;
-import com.github.fru.torsion.bytecode.normalization.Type;
-import com.sun.org.apache.xpath.internal.operations.Variable;
 
 public class InvocationOperation extends MethodBody.AbstractParser{
 	
-	public InvocationOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
-		super(stack,constants,body);
+	public InvocationOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
+		super(stack,constants,body,clazz);
 	}
 
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream) throws EOFException {
-		Variable<ClassFileConstant> constant = new Variable<ClassFileConstant>(constants.get(byteStream.findShort()),Type.REFERENCE);
+	public void parse(int bytecode, ByteInputStream byteStream, int location) throws EOFException {
+		ClassFileConstant constant = constants.get(byteStream.findShort());
 		
 		//TODO find type
 		
 		
 		switch(bytecode){
 		case 0xB2:
+			
 			//out.add(new Instruction("=static").add(constant).add(stack.push(new Variable())));
 			break;
 		case 0xB3:
-			System.out.println("static "+constant);
+			//
+			ClassFileConstant nameAndType = constants.get(constant.getRef2());
+			String name = constants.get(nameAndType.getRef1()).getConstant();
+			body.add(new Instruction(location).add(new Identifier(name, clazz)));
 			//out.add(new Instruction("=static",stack.pop(),constant));
 			break;
 		case 0xB4:

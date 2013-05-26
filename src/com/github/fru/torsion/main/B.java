@@ -2,7 +2,7 @@ package com.github.fru.torsion.main;
 
 public class B {
 	
-	private static int a;
+	protected static int a;
 
 	public void test(){
 		this.toString();

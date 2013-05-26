@@ -15,8 +15,8 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class GotoOperation extends MethodBody.AbstractParser{
 	
-	public GotoOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
-		super(stack,constants,body);
+	public GotoOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
+		super(stack,constants,body,clazz);
 	}
 
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException{

@@ -1,7 +1,7 @@
 package com.github.fru.torsion.main;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.AccessibleObject;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.ClassFile;
@@ -10,11 +10,11 @@ import com.github.fru.torsion.bytecode.normalization.MethodBody;
 public class Main_ByteCode {
 
 	public static void main(String... args) throws IOException {
-		HashMap<Method, MethodBody> result = ClassFile.parse(B.class);
-	
-		//System.out.println("Not supported operations: \n");
-		for(int i = 0; i < 0xCA; i++){
-			//if(!BytecodeParser.isBytecodeSupported(i))System.out.println(i);
+		HashMap<AccessibleObject, MethodBody> result = ClassFile.parse(B.class);
+		for(AccessibleObject o : result.keySet()){
+			System.out.println("+++ "+o+" +++");
+			System.out.println(result.get(o).toString());
+			System.out.println("");
 		}
 	}
 

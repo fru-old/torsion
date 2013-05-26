@@ -15,8 +15,8 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class PrimitiveOperation extends MethodBody.AbstractParser{
 	
-	public PrimitiveOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
-		super(stack,constants,body);
+	public PrimitiveOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
+		super(stack,constants,body,clazz);
 	}
 	
 	

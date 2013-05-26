@@ -17,8 +17,8 @@ import com.github.fru.torsion.bytecode.utils.Variable;
 
 public class ConstantOperation extends MethodBody.AbstractParser{
 	
-	public ConstantOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
-		super(stack,constants,body);
+	public ConstantOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
+		super(stack,constants,body,clazz);
 	}
 
 	@Override
