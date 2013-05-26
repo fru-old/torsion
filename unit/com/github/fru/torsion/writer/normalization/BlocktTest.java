@@ -14,14 +14,14 @@ public class BlocktTest {
 		int count = 10;
 		Random random = new Random();
 		for(int i = 0; i < count; i++){
-			m.body.add(new Operation(Operation.Type.NOOP,i));
+			m.body.add(new PrimitiveOperation(PrimitiveOperation.Type.NOOP,i));
 			int target = random.nextInt(count-1);
 			if(target >= i)target++;
-			Operation.Type t = target > i ? Operation.Type.GOTO_FORWARD : Operation.Type.GOTO_BACKWARD;
-			m.body.add(new Operation(t,i).setJump(target));
+			PrimitiveOperation.Type t = target > i ? PrimitiveOperation.Type.GOTO_FORWARD : PrimitiveOperation.Type.GOTO_BACKWARD;
+			m.body.add(new PrimitiveOperation(t,i).setJump(target));
 		}
 		m.body.setImmutable();
-		Operation.assignJumpOperation(m);
+		PrimitiveOperation.assignJumpOperation(m);
 		//m = new Method(m, Block.applyBlock(m.body, 2, 15, Direction.FORWARD));
 		System.out.println(m.toString());
 	}

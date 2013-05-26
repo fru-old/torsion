@@ -2,30 +2,24 @@ package com.github.fru.torsion.bytecode;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
-import com.github.fru.torsion.bytecode.parser.Abstract;
-import com.github.fru.torsion.bytecode.utils.ByteInputStream;
-import com.github.fru.torsion.bytecode.utils.CodeList;
-import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Variable;
+import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.bytecode.normalization.MethodBody;
 
 public class ClassFile {
-
-	public static ClassFile parse(String name) throws IOException {
-		return new ClassFile(new ByteInputStream(Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(name.replace('.', '/') + ".class")));
+	
+	public static HashMap<Method,MethodBody> parse(Class<?> c) throws IOException {
+		return new ClassFile().parse(new ByteInputStream(Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(c.getName().replace('.', '/') + ".class")),c);
 	}
 
-	public static ClassFile parse(java.lang.Class<?> c) throws IOException {
-		return ClassFile.parse(c.getName());
-	}
+	HashMap<Method,MethodBody> result = new HashMap<Method, MethodBody>(); 
+	HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
 
-	private ClassFile(ByteInputStream reader) throws IOException {
+	@SuppressWarnings("unused")
+	private HashMap<Method,MethodBody> parse(ByteInputStream reader, Class<?> clazz) throws IOException {
 		// PARSE: Magic number
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };
 
@@ -37,12 +31,12 @@ public class ClassFile {
 		}
 
 		// PARSE: Version
-		minorVersion = reader.findShort();
-		majorVersion = reader.findShort();
+		int minorVersion = reader.findShort();
+		int majorVersion = reader.findShort();
 
 		// PARSE: Constant table
 		int constantPoolCount = reader.findShort();
-		this.constants = new HashMap<Integer, ClassFileConstant>();
+		HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
 
 		for (int c = 1; c < constantPoolCount; c++) {
 			ClassFileConstant constant = ClassFileConstant.parse(reader);
@@ -54,107 +48,71 @@ public class ClassFile {
 		}
 
 		// PARSE: Class Information
-		accessFlags = reader.findShort();
-		thisClass = reader.findShort();
-		superClass = reader.findShort();
+		int accessFlags = reader.findShort();
+		int thisClass = reader.findShort();
+		int superClass = reader.findShort();
 
 		int interfaceCount = reader.findShort();
-		interfaces = new int[interfaceCount];
+		int[] interfaces = new int[interfaceCount];
 		for (int i = 0; i < interfaces.length; i++) {
 			interfaces[i] = reader.findShort();
 		}
 
 		// PARSE: Fields
 		int fieldCount = reader.findShort();
-		fieldsFlag = new int[fieldCount];
-		fieldsName = new int[fieldCount];
-		fieldsType = new int[fieldCount];
+		int[] fieldsFlag = new int[fieldCount];
+		int[] fieldsName = new int[fieldCount];
+		int[] fieldsType = new int[fieldCount];
 		for (int i = 0; i < fieldCount; i++) {
 			fieldsFlag[i] = reader.findShort();
 			fieldsName[i] = reader.findShort();
 			fieldsType[i] = reader.findShort();
-			findAttributes(reader);
+			findAttributes(reader,null);
 		}
 
 		// PARSE: Methods
 		int methodCount = reader.findShort();
-		methodsFlag = new int[methodCount];
-		methodsName = new int[methodCount];
-		methodsType = new int[methodCount];
-		methodsInstructions = new ArrayList<CodeList<Instruction>>();
+		int[] methodsFlag = new int[methodCount];
+		int[] methodsName = new int[methodCount];
+		int[] methodsType = new int[methodCount];
 		for (int i = 0; i < methodCount; i++) {
 			methodsFlag[i] = reader.findShort();
 			methodsName[i] = reader.findShort();
 			methodsType[i] = reader.findShort();
-			findAttributes(reader);
+			Method method = Identifier.parseMethodConstant(methodsName[i], methodsType[i], clazz, constants);
+			findAttributes(reader,method);
 		}
 
 		// PARSE: Info
-		findAttributes(reader);
+		findAttributes(reader, null);
 
 		if (reader.getInput().read() != -1) { // The end should be reached
 			throw new IOException("Expected end of file at "+reader.getPosition());
 		}
+		return result;
 	}
 
-	Map<Integer, ClassFileConstant> constants;
-
-	int minorVersion;
-	int majorVersion;
-
-	int accessFlags;
-	int thisClass;
-	int superClass;
-	int[] interfaces;
-
-	int[] fieldsFlag;
-	int[] fieldsName;
-	int[] fieldsType;
-
-	int[] methodsFlag;
-	int[] methodsName;
-	int[] methodsType;
-	
-	ArrayList<CodeList<Instruction>> methodsInstructions;
-
-	public void findAttributes(ByteInputStream reader) throws EOFException {
+	private void findAttributes(ByteInputStream reader, Method current) throws IOException {
 		int attributeCount = reader.findShort();
 		for (int i = 0; i < attributeCount; i++) {
 			int name = reader.findShort();
 			int size = reader.findInt(); // attribute length
-			parseAttribute(new ByteInputStream(reader, size),
-					constants.get(name).value);
+			parseAttribute(new ByteInputStream(reader, size), constants.get(name).value, current);
 		}
 	}
 
 	@SuppressWarnings("unused")
-	public void parseAttribute(ByteInputStream reader, String name) throws EOFException {
+	private void parseAttribute(ByteInputStream reader, String name, Method current) throws IOException {
 		if("code".equalsIgnoreCase(name)){
 			int maxStack = reader.findShort();
 		    int maxLocal = reader.findShort();
 		    
-		    CodeList<Instruction> code = new CodeList<Instruction>();
-		    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
-		    int startOffset = byteStream.getByteCount();
-		    Stack<Variable<?>> stack = new Stack<Variable<?>>();
-		    try{
-		    	while(true){
-		    		long offset = byteStream.getByteCount() - startOffset + 1;
-		    		List<Instruction> c = Abstract.parse(byteStream, offset, constants, stack);
-		    		if(c!=null)code.addAll(c);
-		    	}
-		    }catch(EOFException exception){
-		    	// Expected
-		    }catch(IOException unexpected){
-		    	unexpected.printStackTrace();
-		    	System.exit(-1);
-		    }
+		    MethodBody body = new MethodBody();
+		    body.parseBody(reader, constants);
 		    
-		    BytecodeNormalization.normalize(code);
-		    methodsInstructions.add(code);
+		    result.put(current, body);
 		    
 		    int tablelength = reader.findShort();
-		    
 		    for(int i = 0; i < tablelength; i++){
 		      int from = reader.findShort();
 		      int to = reader.findShort();
@@ -164,7 +122,7 @@ public class ClassFile {
 		      else System.out.println(String.format( "Handle exception [%s] from [%s] to [%s] then jump to [%S]", exception,from,to,jump ));
 		    }
 
-		    findAttributes( reader );
+		    findAttributes( reader, current );
 		}else{
 			try {
 				while (true)
@@ -173,60 +131,5 @@ public class ClassFile {
 				// Expected
 			}
 		}
-	}
-	
-	public String toString() {
-		String out = "";
-		out += "-------- Details --------\n";
-		out += String.format("Minor version [%s]\n", minorVersion);
-		out += String.format("Mayor version [%s]\n", majorVersion);
-		out += String.format("Class access flag  [%s]\n", accessFlags);
-		out += String.format("Class this [%s]\n", thisClass);
-		out += String.format("Class super [%s]\n", superClass);
-		for (int i : interfaces) {
-			out += String.format("Class has interface [%s]\n", interfaces[i]);
-		}
-		for (int i = 0; i < fieldsName.length; i++) {
-			out += String.format("Found field [%s] of type [%s]\n",
-					fieldsName[i], fieldsType[i]);
-		}
-		out += "\n-------- Constants --------\n";
-		for(Integer key : constants.keySet()){
-			out += key+": "+constants.get(key)+"\n";
-		}
-		for (int i = 0; i < methodsName.length; i++) {
-			out += "\n-------- Code --------\n";
-			out += toStringMethod(i)+"\n";
-			CodeList<Instruction> code = methodsInstructions.get(i);
-			if(code != null)out += toStringIndentedCode(code);
-		}
-		return out;
-	}
-	
-	public static String toStringIndentedCode(CodeList<Instruction> operations){
-		String out = "";
-		Stack<Instruction> stack = new Stack<Instruction>();
-		for(Instruction i : operations){
-			String tabs = "";for(int t = 0; t < stack.size(); t++)tabs+="\t";
-			if(i.getOperation().equals(Instruction.START_INSTRUCTION)){
-				stack.push(i);
-			}else if(i.getOperation().equals(Instruction.END_INSTRUCTION)){
-				if(tabs.length() > 0){
-					tabs = tabs.substring(1);
-					Instruction p = stack.pop();
-					if(!i.getParam(-1).equals(p.getParam(-1))){
-						//throw new RuntimeException();
-					}
-					
-				}
-			}
-			out += tabs + i + "\n";
-		}
-		return out;
-	}
-	
-	public String toStringMethod(int method){
-		return String.format("Found method [%s] of type [%s]",
-				methodsName[method], methodsType[method]);
 	}
 }

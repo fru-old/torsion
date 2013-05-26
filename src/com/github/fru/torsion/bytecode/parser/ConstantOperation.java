@@ -2,22 +2,23 @@ package com.github.fru.torsion.bytecode.parser;
 
 import java.io.EOFException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.ClassFileConstant.ClassFileConstantType;
+import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.bytecode.normalization.MethodBody;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public class Constants extends Abstract {
-
-	Map<Integer, ClassFileConstant> constants;
-
-	public Constants(Map<Integer, ClassFileConstant> constants) {
-		this.constants = constants;
+public class ConstantOperation extends MethodBody.AbstractParser{
+	
+	public ConstantOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body) {
+		super(stack,constants,body);
 	}
 
 	@Override

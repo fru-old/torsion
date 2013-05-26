@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import com.github.fru.torsion.bytecode.utils.ByteInputStream;
-
 public class ClassFileConstant {
 
 	public static enum ClassFileConstantType {
