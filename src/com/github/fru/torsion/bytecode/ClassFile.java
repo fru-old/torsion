@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.github.fru.torsion.bytecode.map.BytecodeParser;
+import com.github.fru.torsion.bytecode.parser.Abstract;
 import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.CodeList;
 import com.github.fru.torsion.bytecode.utils.Instruction;
@@ -140,7 +140,7 @@ public class ClassFile {
 		    try{
 		    	while(true){
 		    		long offset = byteStream.getByteCount() - startOffset + 1;
-		    		List<Instruction> c = BytecodeParser.parse(byteStream, offset, constants, stack);
+		    		List<Instruction> c = Abstract.parse(byteStream, offset, constants, stack);
 		    		if(c!=null)code.addAll(c);
 		    	}
 		    }catch(EOFException exception){

@@ -1,4 +1,4 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public class OperationBytecodeParser extends BytecodeParser {
+public class Operation extends Abstract {
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException {
 		String operation = null;

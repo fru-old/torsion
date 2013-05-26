@@ -1,4 +1,4 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import com.github.fru.torsion.bytecode.utils.ByteInputStream;
 import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public class UnsupportedBytecodeParser extends BytecodeParser{
+public class Unsupported extends Abstract{
 
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException {

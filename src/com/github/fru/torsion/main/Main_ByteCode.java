@@ -3,7 +3,7 @@ package com.github.fru.torsion.main;
 import java.io.IOException;
 
 import com.github.fru.torsion.bytecode.ClassFile;
-import com.github.fru.torsion.bytecode.map.BytecodeParser;
+import com.github.fru.torsion.bytecode.parser.Abstract;
 
 public class Main_ByteCode {
 

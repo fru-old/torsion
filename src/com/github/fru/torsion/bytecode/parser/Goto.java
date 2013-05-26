@@ -1,4 +1,4 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public class GotoBytecodeParser extends BytecodeParser {
+public class Goto extends Abstract {
 
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException{
 		String op = null;

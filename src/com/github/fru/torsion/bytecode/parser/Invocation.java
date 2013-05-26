@@ -1,4 +1,4 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -11,11 +11,11 @@ import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public class InvocationBytecodeParser extends BytecodeParser{
+public class Invocation extends Abstract{
 	
 	Map<Integer, ClassFileConstant> constants;
 
-	public InvocationBytecodeParser(Map<Integer, ClassFileConstant> constants) {
+	public Invocation(Map<Integer, ClassFileConstant> constants) {
 		this.constants = constants;
 	}
 

@@ -1,36 +1,38 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
-import com.github.fru.torsion.bytecode.utils.ByteInputStream;
-import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Type;
-import com.github.fru.torsion.bytecode.utils.Variable;
+import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.bytecode.normalization.Identifier.Type;
+import com.github.fru.torsion.bytecode.normalization.Instruction;
+import com.sun.org.apache.xpath.internal.operations.Variable;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
-public abstract class BytecodeParser {
+public abstract class Abstract {
 
-	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws IOException;
+	public abstract void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Identifier> stack, HashMap<Identifier, Type> locals) throws IOException;
 	public abstract boolean isApplicable(int bytecode);
 	
 	
-	static ConstantsBytecodeParser constant;
-	static InvocationBytecodeParser invocation;
-	static ConversionBytecodeParser conversion = new ConversionBytecodeParser();
-	static OperationBytecodeParser operation = new OperationBytecodeParser();
-	static StackBytecodeParser store = new StackBytecodeParser.Store();
-	static StackBytecodeParser load = new StackBytecodeParser.Load();
-	static GotoBytecodeParser jump = new GotoBytecodeParser();
-	static UnsupportedBytecodeParser unsup = new UnsupportedBytecodeParser();
+	static Constants constant;
+	static Invocation invocation;
+	static Conversion conversion = new Conversion();
+	static Operation operation = new Operation();
+	static Stack store = new Stack.Store();
+	static Stack load = new Stack.Load();
+	static Goto jump = new Goto();
+	static Unsupported unsup = new Unsupported();
 	
 	
 	public static ArrayList<Instruction> parse(ByteInputStream byteStream, long offset, Map<Integer, ClassFileConstant> constants, Stack<Variable<?>> stack)
 			throws IOException {
-		if(constant == null || constant.constants != constants)constant = new ConstantsBytecodeParser(constants);
-		if(invocation == null || invocation.constants != constants)invocation = new InvocationBytecodeParser(constants);
+		if(constant == null || constant.constants != constants)constant = new Constants(constants);
+		if(invocation == null || invocation.constants != constants)invocation = new Invocation(constants);
 		
 		ArrayList<Instruction> out = new ArrayList<Instruction>();
 		out.add(new Instruction(":").add(new Variable<Long>(offset,Type.LOCATION)));
@@ -55,8 +57,8 @@ public abstract class BytecodeParser {
 	
 	
 	public static boolean isBytecodeSupported(int bytecode){
-		constant = new ConstantsBytecodeParser(null);
-		invocation = new InvocationBytecodeParser(null);
+		constant = new Constants(null);
+		invocation = new Invocation(null);
 		
 		if(constant.isApplicable(bytecode))return true;
 		else if(conversion.isApplicable(bytecode))return true;

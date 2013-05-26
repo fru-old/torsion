@@ -1,4 +1,4 @@
-package com.github.fru.torsion.bytecode.map;
+package com.github.fru.torsion.bytecode.parser;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import com.github.fru.torsion.bytecode.utils.Instruction;
 import com.github.fru.torsion.bytecode.utils.Type;
 import com.github.fru.torsion.bytecode.utils.Variable;
 
-public abstract class StackBytecodeParser extends BytecodeParser{
+public abstract class Stack extends Abstract{
 	
 	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException{
 		bytecode = normaizeBytecode(bytecode) + 0x15;
@@ -32,7 +32,7 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 	protected abstract void producePrimitive(Type type, int local, ArrayList<Instruction> out, Stack<Variable<?>> stack);
 	protected abstract void produceArray(Type type, ArrayList<Instruction> out, Stack<Variable<?>> stack);
 	
-	public static class Load extends StackBytecodeParser{
+	public static class Load extends Stack{
 		public boolean isApplicable(int bytecode){
 			return 0x15 <= bytecode && bytecode <= 0x35;
 		}
@@ -57,7 +57,7 @@ public abstract class StackBytecodeParser extends BytecodeParser{
 		}
 	}
 	
-	public static class Store extends StackBytecodeParser{
+	public static class Store extends Stack{
 		public boolean isApplicable(int bytecode){
 			return 0x36 <= bytecode && bytecode <= 0x56;
 		}
