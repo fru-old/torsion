@@ -1,6 +1,8 @@
 package com.github.fru.torsion.bytecode.normalization;
 
+import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,6 +39,13 @@ public class Identifier {
 		try {
 			String in = constant.substring(1, middle);
 			for (int i = 0; i < in.length(); i++) {
+				int arrayCount = 0;
+				while(in.charAt(i) == '['){
+					i++;
+					arrayCount++;
+				}
+				Class<?> type;
+				
 				char c = in.charAt(i);
 				if (c == 'L') {
 					int start = i + 1;
@@ -44,21 +53,27 @@ public class Identifier {
 						i++;
 					int end = i;
 					String clazz = in.substring(start, end).replace('/', '.');
-					out.add(Class.forName(clazz));
+					type = Class.forName(clazz);
 
 				}else{
 					switch(c){
-						case 'V': out.add(Void.TYPE); break;
-						case 'I': out.add(int.class); break;
-						case 'J': out.add(long.class); break;
-						case 'F': out.add(float.class); break;
-						case 'D': out.add(double.class); break;
-						case 'B': out.add(byte.class); break;
-						case 'C': out.add(char.class); break;
-						case 'S': out.add(short.class); break;
-						case 'Z': out.add(boolean.class); break;
+						case 'V': type = Void.TYPE; break;
+						case 'I': type = int.class; break;
+						case 'J': type = long.class; break;
+						case 'F': type = float.class; break;
+						case 'D': type = double.class; break;
+						case 'B': type = byte.class; break;
+						case 'C': type = char.class; break;
+						case 'S': type = short.class; break;
+						case 'Z': type = boolean.class; break;
+						default: throw new IOException("Wrong format signature: "+in);
 					}
 				}
+				
+				for(int j = 0; j < arrayCount; j++){
+					type = Array.newInstance(type, 0).getClass();
+				}
+				out.add(type);
 			}
 			return out.toArray(new Class<?>[out.size()]);
 		} catch (Exception exception) {
@@ -68,10 +83,12 @@ public class Identifier {
 	
 	public final AccessibleObject accessible;
 	public final Object id;
+	public final Type type = new Type();
 	
-	public Identifier(String name, Class<?> clazz, String signature){
+	public Identifier(String name, String clazz, String signature){
 		try{
-			this.accessible = parseMethod(name, clazz, parseMethodSignatureConstant(signature));
+			Class<?> c = Class.forName(clazz.replace('/', '.'));
+			this.accessible = parseMethod(name, c, parseMethodSignatureConstant(signature));
 			this.id = null;
 		}catch(Exception exception){
 			throw new RuntimeException(exception);
@@ -92,8 +109,21 @@ public class Identifier {
 		this.id = object;
 	}
 	
+	private static int count = 54953;
 	public Identifier(){
-		this(new Object());
+		this(count++);
+	}
+
+	public static class LocalVariable{
+		int local;
+		public LocalVariable(int local){
+			this.local = local;
+		}
+		
+		@Override
+		public String toString(){
+			return "local "+local;
+		}
 	}
 	
 	@Override
@@ -107,14 +137,24 @@ public class Identifier {
 	public int hashCode(){
 		if(this.accessible != null)return this.accessible.hashCode();
 		if(this.id != null)return this.id.hashCode();
-		return this.hashCode();
+		return super.hashCode();
+	}
+	
+	
+	public String toStringAndType(){
+		return toString()+type.toString();
 	}
 	
 	@Override
 	public String toString(){
 		if(this.accessible != null)return this.accessible.toString();
-		if(this.id != null)return this.id.toString();
-		return this.toString();
+		if(this.id != null){
+			if(this.id instanceof Integer){
+				return Integer.toHexString((Integer)this.id);
+			}
+			return this.id.toString();
+		}
+		return ""+this.hashCode();
 	}
 	
 	//Normalization: Operation StackAssignment

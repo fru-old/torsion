@@ -8,9 +8,15 @@ import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ByteInputStream;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
+import com.github.fru.torsion.bytecode.parser.ConstantOperation;
+import com.github.fru.torsion.bytecode.parser.ConversionOperation;
+import com.github.fru.torsion.bytecode.parser.GotoOperation;
 import com.github.fru.torsion.bytecode.parser.InvocationOperation;
+import com.github.fru.torsion.bytecode.parser.PrimitiveOperation;
+import com.github.fru.torsion.bytecode.parser.StackOperation;
+import com.github.fru.torsion.bytecode.parser.UnsupportedOperation;
 
-public class MethodBody {
+public class Body {
 
 	public final ArrayList<Instruction> body = new ArrayList<Instruction>();
 	public final HashMap<Identifier, Type> local = new HashMap<Identifier, Type>();
@@ -21,13 +27,20 @@ public class MethodBody {
 	    
 	    Stack<Identifier> stack = new Stack<Identifier>();
 	    AbstractParser[] parsers = new AbstractParser[]{
-	    		new InvocationOperation(stack, constants,  body, clazz),
+	    		new InvocationOperation(stack, constants, body, clazz),
+	    		new ConstantOperation(stack, constants, body, clazz),
+	    		new StackOperation.Load(stack, constants, body, clazz),
+	    		new StackOperation.Store(stack, constants, body, clazz),
+	    		new ConversionOperation(stack, constants, body, clazz),
+	    		new GotoOperation(stack, constants, body, clazz),
+	    		new PrimitiveOperation(stack, constants, body, clazz),
+	    		new UnsupportedOperation(stack, constants, body, clazz),
 	    };
 	    try{
 	    	while(true){
 	    		int offset = byteStream.getByteCount() - startOffset + 1;
-	    		body.add(new Instruction(offset));
 	    		int bytecode = byteStream.findNext();
+	    		body.add(new Instruction(offset));
 	    		for(AbstractParser parser : parsers){
 	    			if(parser.isApplicable(bytecode)){
 	    				parser.parse(bytecode, byteStream, offset);
@@ -55,7 +68,7 @@ public class MethodBody {
 		protected final Stack<Identifier> stack;
 		protected final HashMap<Integer, ClassFileConstant> constants; 
 		protected final ArrayList<Instruction> body;
-		protected final  Class<?> clazz;
+		protected final Class<?> clazz;
 		
 		public AbstractParser(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz){
 			this.stack = stack;

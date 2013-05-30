@@ -5,15 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import com.github.fru.torsion.bytecode.ByteInputStream;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
-import com.github.fru.torsion.bytecode.normalization.MethodBody;
-import com.github.fru.torsion.bytecode.utils.ByteInputStream;
-import com.github.fru.torsion.bytecode.utils.Instruction;
-import com.github.fru.torsion.bytecode.utils.Type;
-import com.github.fru.torsion.bytecode.utils.Variable;
+import com.github.fru.torsion.bytecode.normalization.Instruction;
+import com.github.fru.torsion.bytecode.normalization.Body;
+import com.github.fru.torsion.bytecode.normalization.Type;
 
-public class PrimitiveOperation extends MethodBody.AbstractParser{
+public class PrimitiveOperation extends Body.AbstractParser{
 	
 	public PrimitiveOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
 		super(stack,constants,body,clazz);
@@ -21,9 +20,9 @@ public class PrimitiveOperation extends MethodBody.AbstractParser{
 	
 	
 	@Override
-	public void parse(int bytecode, ByteInputStream byteStream, ArrayList<Instruction> out, Stack<Variable<?>> stack) throws EOFException {
+	public void parse(int bytecode, ByteInputStream byteStream, int location) throws EOFException {
 		String operation = null;
-		Type type = null;
+		Class<?> type = null;
 		
 		if(0x60 <= bytecode && bytecode <= 0x77){
 			String[] operations = {"+","-","*","/","%","negate"};
@@ -36,14 +35,20 @@ public class PrimitiveOperation extends MethodBody.AbstractParser{
 			type = Type.getBasicType((bytecode-0x78)%2);	
 		}
 		
+		Identifier to = new Identifier();
+		to.type.add(type);
+		
 		Instruction i;
 		if(0x74 <= bytecode && bytecode <= 0x77){//Negation
-			Variable<?> inter = stack.pop();
-			i = new Instruction(operation).add(inter).add(stack.push(new Variable.Default(inter.getType())));
+			Identifier from = stack.pop();
+			i = new Instruction(location,operation).add(to).add(from);
 		}else{
-			i = new Instruction(operation).add(stack.pop()).add(stack.pop()).add(stack.push(new Variable.Default(type)));
+			Identifier from1 = stack.pop();
+			Identifier from2 = stack.pop();
+			i = new Instruction(location,operation).add(to).add(from1).add(from2);
 		}
-		out.add(i);
+		stack.push(to);
+		body.add(i);
 	}
 
 	@Override

@@ -6,20 +6,20 @@ import java.lang.reflect.AccessibleObject;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.normalization.Identifier;
-import com.github.fru.torsion.bytecode.normalization.MethodBody;
+import com.github.fru.torsion.bytecode.normalization.Body;
 
 public class ClassFile {
 	
-	public static HashMap<AccessibleObject,MethodBody> parse(Class<?> c) throws IOException {
+	public static HashMap<AccessibleObject,Body> parse(Class<?> c) throws IOException {
 		return new ClassFile().parse(new ByteInputStream(Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream(c.getName().replace('.', '/') + ".class")),c);
 	}
 
-	final HashMap<AccessibleObject,MethodBody> result = new HashMap<AccessibleObject, MethodBody>(); 
+	final HashMap<AccessibleObject,Body> result = new HashMap<AccessibleObject, Body>(); 
 	final HashMap<Integer, ClassFileConstant> constants = new HashMap<Integer, ClassFileConstant>();
 
 	@SuppressWarnings("unused")
-	private HashMap<AccessibleObject,MethodBody> parse(ByteInputStream reader, Class<?> clazz) throws IOException {
+	private HashMap<AccessibleObject,Body> parse(ByteInputStream reader, Class<?> clazz) throws IOException {
 		// PARSE: Magic number
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };
 
@@ -106,7 +106,7 @@ public class ClassFile {
 			int maxStack = reader.findShort();
 		    int maxLocal = reader.findShort();
 		    
-		    MethodBody body = new MethodBody();
+		    Body body = new Body();
 		    body.parseBody(reader, constants, clazz);
 		    
 		    result.put(current, body);

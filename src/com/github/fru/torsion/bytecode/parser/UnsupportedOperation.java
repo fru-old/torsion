@@ -9,9 +9,9 @@ import com.github.fru.torsion.bytecode.ByteInputStream;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
-import com.github.fru.torsion.bytecode.normalization.MethodBody;
+import com.github.fru.torsion.bytecode.normalization.Body;
 
-public class UnsupportedOperation extends MethodBody.AbstractParser{
+public class UnsupportedOperation extends Body.AbstractParser{
 	
 	public UnsupportedOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
 		super(stack,constants,body,clazz);
@@ -19,14 +19,17 @@ public class UnsupportedOperation extends MethodBody.AbstractParser{
 
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, int location) throws IOException {
-		throw new RuntimeException("The Bytecode ["+Integer.toHexString(bytecode)+"] is not supported!");
+		System.err.println("The Bytecode [0x"+Integer.toHexString(bytecode)+"] is not supported!");
+		//throw new RuntimeException("The Bytecode [0x"+Integer.toHexString(bytecode)+"] is not supported!");
+		//TODO throw exception again
 	}
 
 	@Override
 	public boolean isApplicable(int bytecode) {
-		if(bytecode == 0xC2 || bytecode == 0xC3)return true;
+		return true;
+		/*if(bytecode == 0xC2 || bytecode == 0xC3)return true;
 		if(bytecode == 0xBA)return true;
-		return false;
+		return false;*/
 	}
 
 }

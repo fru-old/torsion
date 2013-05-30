@@ -24,11 +24,13 @@ public class Instruction {
 			out.append(operation);
 			out.append("( ");
 			for(Identifier id : parameter){
-				out.append(id.toString());
+				out.append(id.toStringAndType());
 				out.append(", ");
 			}
 			out.append(")");
 			return out.toString();
+		}else if(!operation.equals("=")){
+			return operation;
 		}
 		return "NOOP "+location;
 	}

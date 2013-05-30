@@ -2,11 +2,12 @@ package com.github.fru.torsion.main;
 
 public class B {
 	
-	protected static int a;
+	protected int a;
 
 	public void test(){
+		String.valueOf(true);
 		this.toString();
-		B.a = 0;
+		int t = this.a;
 	}
 	
 	@Override
