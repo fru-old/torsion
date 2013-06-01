@@ -32,8 +32,7 @@ public class Body {
 	    AbstractParser[] parsers = new AbstractParser[]{
 	    		new InvocationOperation(stack, constants, body, clazz),
 	    		new ConstantOperation(stack, constants, body, clazz),
-	    		new StackOperation.Load(stack, constants, body, clazz),
-	    		new StackOperation.Store(stack, constants, body, clazz),
+	    		new StackOperation(stack, constants, body, clazz),
 	    		new ConversionOperation(stack, constants, body, clazz),
 	    		new GotoOperation(stack, constants, body, clazz),
 	    		new PrimitiveOperation(stack, constants, body, clazz),
@@ -49,14 +48,10 @@ public class Body {
 	    		for(AbstractParser parser : parsers){
 	    			if(parser.isApplicable(bytecode)){
 	    				try{
-	    					//TODO remove (was only for debugging)
-	    					//System.out.println("0x"+Integer.toHexString(bytecode));
 	    					parser.parse(bytecode, byteStream, offset);
 	    				}catch(RuntimeException e){
-	    					//System.out.println(this);
 	    					throw e;
 	    				}
-	    				
 	    				break;
 	    			}
 	    		}

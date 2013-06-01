@@ -12,33 +12,39 @@ import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Identifier.LocalVariable;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
 
-public abstract class StackOperation extends Body.AbstractParser{
+public class StackOperation extends Body.AbstractParser{
 	
 	public StackOperation(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
 		super(stack,constants,body,clazz);
 	}
 	
 	public void parse(int bytecode, ByteInputStream byteStream, int location) throws EOFException {
-		bytecode = normaizeBytecode(bytecode) + 0x15;
+		boolean isWide = 0xC4 == bytecode;
+		if(isWide)bytecode = byteStream.nextByte();
+		boolean isLoad = 0x15 <= bytecode && bytecode <= 0x35;
+		if(!isLoad)bytecode = bytecode - 0x20;
 		
 		if(0x15 <= bytecode && bytecode <= 0x19){
-			int local = byteStream.nextByte();
+			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();
 			Class<?> type = StackOperation.getBasicType(bytecode-0x15);
-			producePrimitive(location, type, local);
+			producePrimitive(location, type, local,isLoad);
 		}else if(0x1A <= bytecode && bytecode <= 0x2D ){
 			int local = (bytecode-0x1A) % 4;
 			Class<?> type = StackOperation.getBasicType((bytecode-0x1A) / 4);
-			producePrimitive(location, type, local);
+			producePrimitive(location, type, local,isLoad);
 		}else if(0x2E <= bytecode && bytecode <= 0x35){
 			Class<?> type = StackOperation.getBasicType(bytecode-0x2E);
-			produceArray(location,type);
+			produceArray(location,type,isLoad);
 		}else if(bytecode == 0x84){
-			int local = byteStream.nextByte();
-			byte value = (byte)byteStream.nextByte();
+			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();
 			Instruction i = new Instruction(location,"+");
 			Identifier l = new Identifier(new Identifier.LocalVariable(local));
 			Identifier c = new Identifier();
-			c.type.con(value);
+			if(isWide){
+				c.type.con((short)byteStream.nextShort());
+			}else{
+				c.type.con((byte)byteStream.nextByte());
+			}
 			i.add(l).add(c).add(l);
 			body.add(i);
 			return;
@@ -50,22 +56,8 @@ public abstract class StackOperation extends Body.AbstractParser{
 				double.class,null,byte.class,char.class,short.class}[i];
 	}
 	
-	protected abstract int normaizeBytecode(int bytecode);
-	protected abstract void producePrimitive(int location, Class<?> type, int local);
-	protected abstract void produceArray(int location, Class<?> type);
-	
-	public static class Load extends StackOperation{
-		
-		public Load(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
-			super(stack,constants,body,clazz);
-		}
-		
-		public boolean isApplicable(int bytecode){
-			return 0x15 <= bytecode && bytecode <= 0x35;
-		}
-		
-		@Override
-		protected void producePrimitive(int location, Class<?> type, int local) {
+	protected void producePrimitive(int location, Class<?> type, int local, boolean isLoad) {
+		if(isLoad){
 			Instruction i = new Instruction(location,"=");
 			Identifier from = new Identifier(new LocalVariable(local));
 			Identifier result = new Identifier();
@@ -74,10 +66,16 @@ public abstract class StackOperation extends Body.AbstractParser{
 			stack.push(result);
 			i.add(result).add(from);
 			body.add(i);
+		}else{
+			Instruction i = new Instruction(location,"=");
+			Identifier value = stack.pop();
+			Identifier result = new Identifier(new LocalVariable(local));
+			body.add(i.add(result).add(value));
 		}
-
-		@Override
-		protected void produceArray(int location, Class<?> type) {
+	}
+	
+	protected void produceArray(int location, Class<?> type, boolean isLoad) {
+		if(isLoad){
 			Instruction i = new Instruction(location, "fromarray");
 			Identifier index = stack.pop();
 			Identifier array = stack.pop();
@@ -89,45 +87,20 @@ public abstract class StackOperation extends Body.AbstractParser{
 			i.add(index);
 			stack.push(result);
 			body.add(i);
-		}
-
-		@Override
-		protected int normaizeBytecode(int bytecode) {
-			return bytecode - 0x15;
-		}
-	}
-	
-	public static class Store extends StackOperation{
-		
-		public Store(Stack<Identifier> stack, HashMap<Integer, ClassFileConstant> constants, ArrayList<Instruction> body, Class<?> clazz) {
-			super(stack,constants,body,clazz);
-		}
-		
-		public boolean isApplicable(int bytecode){
-			return 0x36 <= bytecode && bytecode <= 0x56;
-		}
-		
-		@Override
-		protected void producePrimitive(int location, Class<?> type, int local) {
-			Instruction i = new Instruction(location,"=");
-			Identifier value = stack.pop();
-			Identifier result = new Identifier(new LocalVariable(local));
-			body.add(i.add(result).add(value));
-		}
-
-		@Override
-		protected void produceArray(int location, Class<?> type) {
+		}else{
 			Instruction i = new Instruction(location,"toarray");
 			i.add(stack.pop()); //array
 			i.add(stack.pop()); //index
 			i.add(stack.pop()); //value
 			body.add(i);
-		}
-
-		@Override
-		protected int normaizeBytecode(int bytecode) {
-			return bytecode - 0x36;
-		}
+		}	
 	}
 	
+	
+	public boolean isApplicable(int bytecode){
+		if(0x36 <= bytecode && bytecode <= 0x56)return true;
+		if(0x15 <= bytecode && bytecode <= 0x35)return true;
+		if(0x84 == bytecode || bytecode == 0xC4)return true;
+		return false;
+	}
 }
