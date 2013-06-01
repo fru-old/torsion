@@ -2,6 +2,7 @@ package com.github.fru.torsion.bytecode.normalization;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -14,6 +15,7 @@ import com.github.fru.torsion.bytecode.parser.GotoOperation;
 import com.github.fru.torsion.bytecode.parser.InvocationOperation;
 import com.github.fru.torsion.bytecode.parser.PrimitiveOperation;
 import com.github.fru.torsion.bytecode.parser.StackOperation;
+import com.github.fru.torsion.bytecode.parser.TypeDependentOperation;
 import com.github.fru.torsion.bytecode.parser.UnsupportedOperation;
 
 public class Body {
@@ -21,7 +23,7 @@ public class Body {
 	public final ArrayList<Instruction> body = new ArrayList<Instruction>();
 	public final HashMap<Identifier, Type> local = new HashMap<Identifier, Type>();
 	
-	public void parseBody(ByteInputStream reader, HashMap<Integer, ClassFileConstant> constants, Class<?> clazz) throws IOException{
+	public void parseBody(ByteInputStream reader, HashMap<Integer, ClassFileConstant> constants, AccessibleObject accessable, Class<?> clazz) throws IOException{
 	    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
 	    int startOffset = byteStream.getByteCount();
 	    
@@ -34,6 +36,7 @@ public class Body {
 	    		new ConversionOperation(stack, constants, body, clazz),
 	    		new GotoOperation(stack, constants, body, clazz),
 	    		new PrimitiveOperation(stack, constants, body, clazz),
+	    		new TypeDependentOperation(stack, constants, body, clazz),
 	    		new UnsupportedOperation(stack, constants, body, clazz),
 	    };
 	    try{
@@ -43,7 +46,15 @@ public class Body {
 	    		body.add(new Instruction(offset));
 	    		for(AbstractParser parser : parsers){
 	    			if(parser.isApplicable(bytecode)){
-	    				parser.parse(bytecode, byteStream, offset);
+	    				try{
+	    					//TODO remove (was only for debugging)
+	    					//System.out.println("0x"+Integer.toHexString(bytecode));
+	    					parser.parse(bytecode, byteStream, offset);
+	    				}catch(RuntimeException e){
+	    					//System.out.println(this);
+	    					throw e;
+	    				}
+	    				
 	    				break;
 	    			}
 	    		}

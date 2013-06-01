@@ -8,7 +8,7 @@ public class Instruction {
 	public final String operation;
 	
 	public Instruction(int location){
-		this(location,"=");
+		this(location,"");
 	}
 	
 	public Instruction(int location, String operation){
@@ -29,7 +29,7 @@ public class Instruction {
 			}
 			out.append(")");
 			return out.toString();
-		}else if(!operation.equals("=")){
+		}else if(!operation.equals("")){
 			return operation;
 		}
 		return "NOOP "+location;

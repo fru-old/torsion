@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
 import java.util.HashMap;
 
+import com.github.fru.torsion.bytecode.normalization.Block;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Body;
 
@@ -96,7 +97,7 @@ public class ClassFile {
 		for (int i = 0; i < attributeCount; i++) {
 			int name = reader.findShort();
 			int size = reader.findInt(); // attribute length
-			parseAttribute(new ByteInputStream(reader, size), constants.get(name).value, current, clazz);
+			parseAttribute(new ByteInputStream(reader, size), constants.get(name).getConstant(), current, clazz);
 		}
 	}
 
@@ -107,7 +108,7 @@ public class ClassFile {
 		    int maxLocal = reader.findShort();
 		    
 		    Body body = new Body();
-		    body.parseBody(reader, constants, clazz);
+		    body.parseBody(reader, constants, current, clazz);
 		    
 		    result.put(current, body);
 		    
@@ -120,6 +121,8 @@ public class ClassFile {
 		      if(exception == 0)System.out.println(String.format( "Handle all exception from [%s] to [%s] then jump to [%S]",from,to,jump ));
 		      else System.out.println(String.format( "Handle exception [%s] from [%s] to [%s] then jump to [%S]", exception,from,to,jump ));
 		    }
+		    
+		    Block.applyBlocks(body.body);
 
 		    findAttributes( reader, current, clazz);
 		}else{

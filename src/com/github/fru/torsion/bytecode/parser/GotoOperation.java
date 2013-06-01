@@ -68,7 +68,7 @@ public class GotoOperation extends Body.AbstractParser{
 			case 0xAF:
 			case 0xB0:
 			case 0xB1:
-				Instruction r = new Instruction(location,".return");
+				Instruction r = new Instruction(location,"return");
 				if(bytecode != 0xB1){
 					r.add(stack.pop());
 				}
@@ -90,9 +90,11 @@ public class GotoOperation extends Body.AbstractParser{
 			
 		if(op != null){
 			body.add(new Instruction(location,op).add(mid).add(stack.pop()).add(comp));
+			stack.push(mid);
+			body.add(new Instruction.Jump(location, index).add(mid));
+		}else{
+			body.add(new Instruction.Jump(location, index));
 		}
-		stack.push(mid);
-		body.add(new Instruction.Jump(location, index).add(mid));
 	}
 	
 	

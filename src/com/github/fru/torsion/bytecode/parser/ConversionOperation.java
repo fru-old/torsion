@@ -93,6 +93,7 @@ public class ConversionOperation extends Body.AbstractParser{
 		Identifier to = new Identifier();
 		to.type.add(toType);
 		body.add(new Instruction(location,"cast").add(to).add(from));
+		stack.push(to);
 	}
 
 	@Override

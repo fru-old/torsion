@@ -1,6 +1,7 @@
 package com.github.fru.torsion.bytecode.parser;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,9 +43,9 @@ public class InvocationOperation extends Body.AbstractParser{
 			if(bytecode == 0xB2 || bytecode == 0xB4){
 				stack.push(other = new Identifier());
 				other.type.add(((Field)id.accessible).getType());
-				body.add(new Instruction(location).add(other).add(id));
+				body.add(new Instruction(location,"=field").add(other).add(id));
 			}else{
-				body.add(new Instruction(location).add(id).add(stack.pop()));
+				body.add(new Instruction(location,"=field").add(id).add(stack.pop()));
 			}
 			break;
 		}
@@ -67,18 +68,28 @@ public class InvocationOperation extends Body.AbstractParser{
 				result = m.getReturnType();
 			}
 			
+			Identifier r = null;
 			if(result != Void.class){
-				Identifier r = new Identifier();
+				r = new Identifier();
 				r.type.add(result);
 				i.add(r);
 			}
 			i.add(accessable);
-			if(bytecode != 0xB8)i.add(stack.pop());
 			
+			int count = 0;
 			if(accessable.accessible instanceof Method){
-				int count = ((Method)accessable.accessible).getParameterTypes().length;
-				for(int j = 0; j < count; j++)i.add(stack.pop());
+				count = ((Method)accessable.accessible).getParameterTypes().length;
+			}else if(accessable.accessible instanceof Constructor<?>){
+				count = ((Constructor<?>)accessable.accessible).getParameterTypes().length;
 			}
+			ArrayList<Identifier> parameter = new ArrayList<Identifier>();
+			for(int j = 0; j < count; j++)parameter.add(stack.pop());
+			if(bytecode != 0xB8)i.add(stack.pop()); //this
+			for(int j = count-1; j >= 0; j--)i.add(parameter.get(j));
+			
+			
+			
+			if(r != null)stack.push(r);
 			body.add(i);
 			if(bytecode == 0xB9)byteStream.findShort();
 			break;

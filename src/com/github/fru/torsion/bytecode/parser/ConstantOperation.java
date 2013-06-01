@@ -7,9 +7,10 @@ import java.util.Stack;
 
 import com.github.fru.torsion.bytecode.ByteInputStream;
 import com.github.fru.torsion.bytecode.ClassFileConstant;
+import com.github.fru.torsion.bytecode.ClassFileConstant.ClassFileConstantType;
+import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
-import com.github.fru.torsion.bytecode.normalization.Body;
 
 public class ConstantOperation extends Body.AbstractParser{
 	
@@ -36,28 +37,23 @@ public class ConstantOperation extends Body.AbstractParser{
 		}else if(bytecode == 0x11){
 			constant.type.con(new Integer(byteStream.findShort()));
 		}else if(bytecode == 0x12){
-			//TODO implement
-			//int location = byteStream.findNext();
-			//constant = new Variable<String>(getConstant(location),Type.getConstantType(location, constants));
+			int index = byteStream.findNext();
+			constant.type.con(getConstant(index));
 		}else if(bytecode == 0x13 || bytecode == 0x14){
-			//int location = byteStream.findShort();
-			//constant = new Variable<String>(getConstant(location),Type.getConstantType(location, constants));
+			int index = byteStream.findShort();
+			constant.type.con(getConstant(index));
 		}
-		
 		stack.push(constant);
-		
-		//Instruction i = new Instruction("=").add(constant).add(stack.push(new Variable.Default(constant.getType())));
-		//out.add(i);
 	}
 	
-	/*private String getConstant(int index){
+	private Object getConstant(int index){
 		ClassFileConstant constant = constants.get(index);
-		String out = constant.getConstant();
+		Object out = constant.getValue();
 		if(constant.getType() == ClassFileConstantType.String){
 			out = constants.get(constant.getRef1()).getConstant();
 		} 
 		return out;
-	}*/
+	}
 	
 	
 

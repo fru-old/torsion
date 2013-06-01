@@ -10,7 +10,7 @@ public class ClassFileConstant {
 		String, Class, NameAndType, MethodRef, FieldRef, InterfaceMethodRef, Integer, Float, Long, Double, Utf8;
 	}
 
-	String value = null;
+	Object value = null;
 
 	int ref1 = -1;
 
@@ -19,6 +19,10 @@ public class ClassFileConstant {
 	private ClassFileConstantType type;
 	
 	public String getConstant(){
+		return ""+value;
+	}
+	
+	public Object getValue(){
 		return value;
 	}
 	
@@ -30,7 +34,7 @@ public class ClassFileConstant {
 		return ref2;
 	}
 
-	private ClassFileConstant(String value) {
+	private ClassFileConstant(Object value) {
 		this.value = value;
 	}
 
@@ -96,19 +100,19 @@ public class ClassFileConstant {
 			break;
 		case 3: // Integer
 			type = ClassFileConstant.ClassFileConstantType.Integer;
-			constant = new ClassFileConstant("" + reader.findInt());
+			constant = new ClassFileConstant(reader.findInt());
 			break;
 		case 4: // Float
 			type = ClassFileConstant.ClassFileConstantType.Float;
-			constant = new ClassFileConstant("" + Float.intBitsToFloat(reader.findInt()));
+			constant = new ClassFileConstant(Float.intBitsToFloat(reader.findInt()));
 			break;
 		case 5: // Long
 			type = ClassFileConstant.ClassFileConstantType.Long;
-			constant = new ClassFileConstant("" + reader.findLong());
+			constant = new ClassFileConstant(reader.findLong());
 			break;
 		case 6: // Double
 			type = ClassFileConstant.ClassFileConstantType.Double;
-			constant = new ClassFileConstant("" + Double.longBitsToDouble(reader.findLong()));
+			constant = new ClassFileConstant(Double.longBitsToDouble(reader.findLong()));
 			break;
 		case 9: // FieldRef
 			type = ClassFileConstant.ClassFileConstantType.FieldRef;

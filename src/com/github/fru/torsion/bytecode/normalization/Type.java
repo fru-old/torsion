@@ -34,9 +34,14 @@ public class Type {
 	public String toString(){
 		return ""+(classes!=null?classes:"")+(constants!=null?constants:"")+(assignedFromVars!=null?assignedFromVars:"");
 	}
-
-	public static Class<?> getBasicType(int i) {
-		return new Class<?>[]{int.class,long.class,float.class,
-				double.class,null,byte.class,char.class,short.class}[i];
+	
+	public boolean canOnlyBeLongOrDouble(){
+		if(classes!=null)for(Class<?> c : classes){
+			if(c == long.class || c == double.class)return true;
+		}
+		if(constants!=null)for(Object o : constants){
+			if(o.getClass() == Long.class || o.getClass() == Double.class )return true;
+		}
+		return false;
 	}
 }

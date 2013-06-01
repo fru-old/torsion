@@ -1,10 +1,14 @@
-package com.github.fru.torsion.bytecode.normalization;
+package com.github.fru.torsion.bytecode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
+
+import com.github.fru.torsion.bytecode.normalization.Block;
+import com.github.fru.torsion.bytecode.normalization.Instruction;
+import com.github.fru.torsion.bytecode.normalization.Instruction.Jump;
 
 public class NormalizationTests {
 

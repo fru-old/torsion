@@ -11,6 +11,15 @@ public class A {
 		Object obj = String.CASE_INSENSITIVE_ORDER;
 		return null;
 	}
+	
+	public int add(int i,int j){
+		return i+j;
+	}
+	
+	//TODO add manual test with description of this and parameter locations and result value standards...
+	public int inc(int i){
+		return add(i,345);
+	}
 
 	public int first(int i) {
 		
