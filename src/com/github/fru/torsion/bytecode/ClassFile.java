@@ -25,18 +25,18 @@ public class ClassFile {
 		int[] array = new int[] { 0xCA, 0xFE, 0xBA, 0xBE };
 
 		for (int a : array) {
-			int next = reader.findNext();
+			int next = reader.nextByte();
 			if (a != next)
 				throw new IOException(
 						"Found ["+next+"] but expected ["+a+"] as in ["+array+"] at "+reader.getPosition() );
 		}
 
 		// PARSE: Version
-		int minorVersion = reader.findShort();
-		int majorVersion = reader.findShort();
+		int minorVersion = reader.nextShort();
+		int majorVersion = reader.nextShort();
 
 		// PARSE: Constant table
-		int constantPoolCount = reader.findShort();
+		int constantPoolCount = reader.nextShort();
 
 		for (int c = 1; c < constantPoolCount; c++) {
 			ClassFileConstant constant = ClassFileConstant.parse(reader);
@@ -48,37 +48,37 @@ public class ClassFile {
 		}
 
 		// PARSE: Class Information
-		int accessFlags = reader.findShort();
-		int thisClass = reader.findShort();
-		int superClass = reader.findShort();
+		int accessFlags = reader.nextShort();
+		int thisClass = reader.nextShort();
+		int superClass = reader.nextShort();
 
-		int interfaceCount = reader.findShort();
+		int interfaceCount = reader.nextShort();
 		int[] interfaces = new int[interfaceCount];
 		for (int i = 0; i < interfaces.length; i++) {
-			interfaces[i] = reader.findShort();
+			interfaces[i] = reader.nextShort();
 		}
 
 		// PARSE: Fields
-		int fieldCount = reader.findShort();
+		int fieldCount = reader.nextShort();
 		int[] fieldsFlag = new int[fieldCount];
 		int[] fieldsName = new int[fieldCount];
 		int[] fieldsType = new int[fieldCount];
 		for (int i = 0; i < fieldCount; i++) {
-			fieldsFlag[i] = reader.findShort();
-			fieldsName[i] = reader.findShort();
-			fieldsType[i] = reader.findShort();
+			fieldsFlag[i] = reader.nextShort();
+			fieldsName[i] = reader.nextShort();
+			fieldsType[i] = reader.nextShort();
 			findAttributes(reader,null,clazz);
 		}
 
 		// PARSE: Methods
-		int methodCount = reader.findShort();
+		int methodCount = reader.nextShort();
 		int[] methodsFlag = new int[methodCount];
 		int[] methodsName = new int[methodCount];
 		int[] methodsType = new int[methodCount];
 		for (int i = 0; i < methodCount; i++) {
-			methodsFlag[i] = reader.findShort();
-			methodsName[i] = reader.findShort();
-			methodsType[i] = reader.findShort();
+			methodsFlag[i] = reader.nextShort();
+			methodsName[i] = reader.nextShort();
+			methodsType[i] = reader.nextShort();
 			AccessibleObject method = Identifier.parseMethodConstant(methodsName[i], methodsType[i], clazz, constants);
 			findAttributes(reader,method,clazz);
 		}
@@ -93,10 +93,10 @@ public class ClassFile {
 	}
 
 	private void findAttributes(ByteInputStream reader, AccessibleObject current, Class<?> clazz) throws IOException {
-		int attributeCount = reader.findShort();
+		int attributeCount = reader.nextShort();
 		for (int i = 0; i < attributeCount; i++) {
-			int name = reader.findShort();
-			int size = reader.findInt(); // attribute length
+			int name = reader.nextShort();
+			int size = reader.nextInt(); // attribute length
 			parseAttribute(new ByteInputStream(reader, size), constants.get(name).getConstant(), current, clazz);
 		}
 	}
@@ -104,20 +104,20 @@ public class ClassFile {
 	@SuppressWarnings("unused")
 	private void parseAttribute(ByteInputStream reader, String name, AccessibleObject current, Class<?> clazz) throws IOException {
 		if("code".equalsIgnoreCase(name)){
-			int maxStack = reader.findShort();
-		    int maxLocal = reader.findShort();
+			int maxStack = reader.nextShort();
+		    int maxLocal = reader.nextShort();
 		    
 		    Body body = new Body();
 		    body.parseBody(reader, constants, current, clazz);
 		    
 		    result.put(current, body);
 		    
-		    int tablelength = reader.findShort();
+		    int tablelength = reader.nextShort();
 		    for(int i = 0; i < tablelength; i++){
-		      int from = reader.findShort();
-		      int to = reader.findShort();
-		      int jump = reader.findShort();
-		      int exception = reader.findShort();
+		      int from = reader.nextShort();
+		      int to = reader.nextShort();
+		      int jump = reader.nextShort();
+		      int exception = reader.nextShort();
 		      if(exception == 0)System.out.println(String.format( "Handle all exception from [%s] to [%s] then jump to [%S]",from,to,jump ));
 		      else System.out.println(String.format( "Handle exception [%s] from [%s] to [%s] then jump to [%S]", exception,from,to,jump ));
 		    }
@@ -128,7 +128,7 @@ public class ClassFile {
 		}else{
 			try {
 				while (true)
-					reader.findNext();
+					reader.nextByte();
 			} catch (EOFException exception) {
 				// Expected
 			}

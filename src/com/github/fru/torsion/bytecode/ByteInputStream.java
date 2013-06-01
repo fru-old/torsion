@@ -26,7 +26,7 @@ public class ByteInputStream {
 		this.maxReads = maxReads;
 	}
 
-	public int findNext() throws EOFException {
+	public int nextByte() throws EOFException {
 		if (maxReads == 0) throw new EOFException();
 		maxReads--;
 		int out = -1;
@@ -42,16 +42,16 @@ public class ByteInputStream {
 		return out;
 	}
 
-	public int findInt() throws EOFException {
-		return (findNext() << 24) + ((findNext() & 0xFF) << 16) + ((findNext() & 0xFF) << 8) + (findNext() & 0xFF);
+	public int nextInt() throws EOFException {
+		return (nextByte() << 24) + ((nextByte() & 0xFF) << 16) + ((nextByte() & 0xFF) << 8) + (nextByte() & 0xFF);
 	}
 
-	public int findShort() throws EOFException {
-		return ((findNext() & 0xFF) << 8) + (findNext() & 0xFF);
+	public int nextShort() throws EOFException {
+		return ((nextByte() & 0xFF) << 8) + (nextByte() & 0xFF);
 	}
 
-	public long findLong() throws EOFException {
-		return ((long) findInt() << 32) + (findInt() & 0xFFFFFFFFL);
+	public long nextLong() throws EOFException {
+		return ((long) nextInt() << 32) + (nextInt() & 0xFFFFFFFFL);
 	}
 
 	public Position getPosition() {

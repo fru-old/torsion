@@ -22,7 +22,7 @@ public abstract class StackOperation extends Body.AbstractParser{
 		bytecode = normaizeBytecode(bytecode) + 0x15;
 		
 		if(0x15 <= bytecode && bytecode <= 0x19){
-			int local = byteStream.findNext();
+			int local = byteStream.nextByte();
 			Class<?> type = StackOperation.getBasicType(bytecode-0x15);
 			producePrimitive(location, type, local);
 		}else if(0x1A <= bytecode && bytecode <= 0x2D ){
@@ -32,6 +32,16 @@ public abstract class StackOperation extends Body.AbstractParser{
 		}else if(0x2E <= bytecode && bytecode <= 0x35){
 			Class<?> type = StackOperation.getBasicType(bytecode-0x2E);
 			produceArray(location,type);
+		}else if(bytecode == 0x84){
+			int local = byteStream.nextByte();
+			byte value = (byte)byteStream.nextByte();
+			Instruction i = new Instruction(location,"+");
+			Identifier l = new Identifier(new Identifier.LocalVariable(local));
+			Identifier c = new Identifier();
+			c.type.con(value);
+			i.add(l).add(c).add(l);
+			body.add(i);
+			return;
 		}
 	}
 	
@@ -69,15 +79,15 @@ public abstract class StackOperation extends Body.AbstractParser{
 		@Override
 		protected void produceArray(int location, Class<?> type) {
 			Instruction i = new Instruction(location, "fromarray");
+			Identifier index = stack.pop();
 			Identifier array = stack.pop();
-			System.out.println(array.toStringAndType());
-			i.add(array);
-			i.add(stack.pop());//index
 			Identifier result = new Identifier();
 			if(type != null)result.type.add(type);
 			result.type.add(array).resolveArrayTypes();
-			stack.push(result);
 			i.add(result);
+			i.add(array);
+			i.add(index);
+			stack.push(result);
 			body.add(i);
 		}
 

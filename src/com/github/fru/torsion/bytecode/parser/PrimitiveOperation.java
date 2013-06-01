@@ -32,16 +32,6 @@ public class PrimitiveOperation extends Body.AbstractParser{
 			String[] operations = {"shl","shr","ushr","and","or","xor"};
 			operation = operations[(bytecode-0x78)/2];
 			type = PrimitiveOperation.getBasicType((bytecode-0x78)%2);	
-		}else if(bytecode == 0x84){
-			int local = byteStream.findNext();
-			byte value = (byte)byteStream.findNext();
-			Instruction i = new Instruction(location,"+");
-			Identifier l = new Identifier(new Identifier.LocalVariable(local));
-			Identifier c = new Identifier();
-			c.type.con(value);
-			i.add(l).add(c).add(l);
-			body.add(i);
-			return;
 		}else if(0x94 <= bytecode && bytecode <= 0x98){
 			Instruction i = new Instruction(location,"compare");
 			Identifier r = new Identifier();
@@ -75,6 +65,6 @@ public class PrimitiveOperation extends Body.AbstractParser{
 
 	@Override
 	public boolean isApplicable(int bytecode) {
-		return 0x60 <= bytecode && bytecode <= 0x84 || 0x94 <= bytecode && bytecode <= 0x98;
+		return 0x60 <= bytecode && bytecode <= 0x83 || 0x94 <= bytecode && bytecode <= 0x98;
 	}
 }

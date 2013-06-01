@@ -13,6 +13,7 @@ public class Type {
 	
 	ArrayList<Object> constants = null;
 	public Type con(Object constant){
+		if(constant instanceof String)constant = "\""+constant+"\"";
 		if(constants == null)constants = new ArrayList<Object>();
 		constants.add(constant);
 		return this;

@@ -29,7 +29,14 @@ public class Identifier {
 		}
 	}
 	
-	public static Class<?>[] parseMethodSignatureConstant(String constant) {
+	private static Class<?> classForArray(Class<?> clazz, int count){
+		for(int j = 0; j < count; j++){
+			clazz = Array.newInstance(clazz, 0).getClass();
+		}
+		return clazz;
+	}
+	
+	private static Class<?>[] parseMethodSignatureConstant(String constant) {
 		ArrayList<Class<?>> out = new ArrayList<Class<?>>();
 		char first = constant.charAt(0);
 		int middle = constant.indexOf(')');
@@ -70,9 +77,7 @@ public class Identifier {
 					}
 				}
 				
-				for(int j = 0; j < arrayCount; j++){
-					type = Array.newInstance(type, 0).getClass();
-				}
+				type = classForArray(type, arrayCount);
 				out.add(type);
 			}
 			return out.toArray(new Class<?>[out.size()]);

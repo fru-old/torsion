@@ -19,7 +19,7 @@ public class UnsupportedOperation extends Body.AbstractParser{
 
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, int location) throws IOException {
-		if(bytecode != 0){
+		if(bytecode != 0 && bytecode < 0xCA){
 			System.err.println("The Bytecode [0x"+Integer.toHexString(bytecode)+"] is not supported!");
 		}
 		//throw new RuntimeException("The Bytecode [0x"+Integer.toHexString(bytecode)+"] is not supported!");

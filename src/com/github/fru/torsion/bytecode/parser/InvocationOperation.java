@@ -22,7 +22,7 @@ public class InvocationOperation extends Body.AbstractParser{
 
 	@Override
 	public void parse(int bytecode, ByteInputStream byteStream, int location) throws IOException {
-		ClassFileConstant constant = constants.get(byteStream.findShort());
+		ClassFileConstant constant = constants.get(byteStream.nextShort());
 		
 		Identifier id;
 		Identifier other;
@@ -47,8 +47,14 @@ public class InvocationOperation extends Body.AbstractParser{
 			}else{
 				body.add(new Instruction(location,"=field").add(id).add(stack.pop()));
 			}
-			break;
+			return;
+		case 0xBA:
+			byteStream.nextShort();
+			System.err.println("Invokedynamic wird leider nicht unterstützt!");
+			return;
 		}
+		
+		
 		
 		switch(bytecode){
 		case 0xB6:
@@ -59,6 +65,7 @@ public class InvocationOperation extends Body.AbstractParser{
 			ClassFileConstant nameAndType = constants.get(constant.getRef2());
 			String name = constants.get(nameAndType.getRef1()).getConstant();
 			String signature = constants.get(nameAndType.getRef2()).getConstant();
+			
 			Identifier accessable = new Identifier(name, clazz, signature);
 			Instruction i = new Instruction(location,bytecode==0xB7?"direct":"call");
 			
@@ -87,24 +94,76 @@ public class InvocationOperation extends Body.AbstractParser{
 			if(bytecode != 0xB8)i.add(stack.pop()); //this
 			for(int j = count-1; j >= 0; j--)i.add(parameter.get(j));
 			
-			
-			
 			if(r != null)stack.push(r);
 			body.add(i);
-			if(bytecode == 0xB9)byteStream.findShort();
-			break;
-		case 0xBA:
-			byteStream.findShort();
-			System.out.println("Invokedynamic wird leider nicht unterstützt!");
-			break;
+			if(bytecode == 0xB9)byteStream.nextShort();
+			return;
 		}
-		//TODO: Invocation need to parse types, to get operand count
+		
+		
+		
+		switch (bytecode) {
+		case 0xBD:
+		case 0xC5:
+		case 0xBB:
+			String classname = constants.get(constant.getRef1()).getConstant().replace('/', '.');
+			Class<?> clazz = null;
+			try {
+				clazz = Class.forName(classname);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("Could not find class "+classname);
+			}
+			
+			int dimension = 0;
+			if(bytecode == 0xC5){
+				dimension = byteStream.nextByte();
+			}else if(bytecode == 0xBD){
+				dimension = 1;
+			}
+		
+			Instruction i = new Instruction(location,"new");
+			Identifier out = new Identifier();
+			out.type.add(clazz);
+			i.add(out);
+			for(int j = 0; j < dimension; j++)i.add(stack.pop());
+			stack.push(out);
+			body.add(i);
+			return;	
+		}
+		
+		switch (bytecode) {
+		case 0xC0:
+		case 0xC1:
+			String classname = constants.get(constant.getRef1()).getConstant().replace('/', '.');
+			Class<?> clazz = null;
+			try {
+				clazz = Class.forName(classname);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("Could not find class "+classname);
+			}
+			Identifier in = stack.pop();
+			Identifier out = new Identifier();
+			stack.push(out);
+			Instruction i;
+			if(bytecode == 0xC0){//checkcast
+				i = new Instruction(location,"checkcast");
+				out.type.add(clazz);
+			}else{//instanceof
+				i = new Instruction(location,"instanceof");
+				out.type.add(boolean.class);
+			}
+			i.add(out).add(in);
+			body.add(i);
+			
+			return;
+		}
 	}
 
 	@Override
 	public boolean isApplicable(int bytecode) {
 		if(0xB2 <= bytecode && bytecode <= 0xBB)return true;
-		if(bytecode == 0xBD)return true;
+		if(bytecode == 0xBD || bytecode == 0xC5)return true;
+		if(bytecode == 0xC0 || bytecode == 0xC1)return true;
 		return false;
 	}
 

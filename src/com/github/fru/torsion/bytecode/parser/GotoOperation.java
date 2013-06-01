@@ -35,7 +35,7 @@ public class GotoOperation extends Body.AbstractParser{
 				op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x99];
 				comp = new Identifier();
 				comp.type.con(new Integer(0));
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0x9F:
 			case 0xA0:
@@ -45,16 +45,16 @@ public class GotoOperation extends Body.AbstractParser{
 			case 0xA4:
 				op = new String[] { "==", "!=", "<", ">=", ">", "<=" }[bytecode - 0x9F];
 				comp = stack.pop();
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0xA5:
 			case 0xA6:
 				op = new String[] { "==", "!=" }[bytecode - 0xA5];
 				comp = stack.pop();
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0xA7:
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0xA8:
 			case 0xA9:
@@ -79,10 +79,10 @@ public class GotoOperation extends Body.AbstractParser{
 				op = new String[] { "==", "!=" }[bytecode - 0xC7];
 				comp = new Identifier();
 				comp.type.con(null);
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0xC8:
-				index =  byteStream.getByteCount() + (short) byteStream.findShort();
+				index =  byteStream.getByteCount() + (short) byteStream.nextShort();
 				break;
 			case 0xC9:
 				throw new IOException("subroutines are not supported.");

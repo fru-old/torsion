@@ -13,6 +13,7 @@ import com.github.fru.torsion.bytecode.parser.ConstantOperation;
 import com.github.fru.torsion.bytecode.parser.ConversionOperation;
 import com.github.fru.torsion.bytecode.parser.GotoOperation;
 import com.github.fru.torsion.bytecode.parser.InvocationOperation;
+import com.github.fru.torsion.bytecode.parser.OtherOperation;
 import com.github.fru.torsion.bytecode.parser.PrimitiveOperation;
 import com.github.fru.torsion.bytecode.parser.StackOperation;
 import com.github.fru.torsion.bytecode.parser.TypeDependentOperation;
@@ -24,7 +25,7 @@ public class Body {
 	public final HashMap<Identifier, Type> local = new HashMap<Identifier, Type>();
 	
 	public void parseBody(ByteInputStream reader, HashMap<Integer, ClassFileConstant> constants, AccessibleObject accessable, Class<?> clazz) throws IOException{
-	    ByteInputStream byteStream = new ByteInputStream(reader,reader.findInt());
+	    ByteInputStream byteStream = new ByteInputStream(reader,reader.nextInt());
 	    int startOffset = byteStream.getByteCount();
 	    
 	    Stack<Identifier> stack = new Stack<Identifier>();
@@ -37,12 +38,13 @@ public class Body {
 	    		new GotoOperation(stack, constants, body, clazz),
 	    		new PrimitiveOperation(stack, constants, body, clazz),
 	    		new TypeDependentOperation(stack, constants, body, clazz),
+	    		new OtherOperation(stack, constants, body, clazz),
 	    		new UnsupportedOperation(stack, constants, body, clazz),
 	    };
 	    try{
 	    	while(true){
 	    		int offset = byteStream.getByteCount() - startOffset + 1;
-	    		int bytecode = byteStream.findNext();
+	    		int bytecode = byteStream.nextByte();
 	    		body.add(new Instruction(offset));
 	    		for(AbstractParser parser : parsers){
 	    			if(parser.isApplicable(bytecode)){

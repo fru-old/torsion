@@ -82,15 +82,15 @@ public class ClassFileConstant {
 	}
 
 	public static ClassFileConstant parse(ByteInputStream reader) throws IOException {
-		int byteType = reader.findNext();
+		int byteType = reader.nextByte();
 		ClassFileConstant.ClassFileConstantType type = null;
 		ClassFileConstant constant = null;
 		switch (byteType) {
 		case 1: // UTF-8
 			type = ClassFileConstant.ClassFileConstantType.Utf8;
-			byte[] bytes = new byte[reader.findShort()];
+			byte[] bytes = new byte[reader.nextShort()];
 			for (int i = 0; i < bytes.length; i++) {
-				bytes[i] = (byte) reader.findNext();
+				bytes[i] = (byte) reader.nextByte();
 			}
 			try {
 				constant = new ClassFileConstant(new String(bytes, "UTF-8"));
@@ -100,43 +100,43 @@ public class ClassFileConstant {
 			break;
 		case 3: // Integer
 			type = ClassFileConstant.ClassFileConstantType.Integer;
-			constant = new ClassFileConstant(reader.findInt());
+			constant = new ClassFileConstant(reader.nextInt());
 			break;
 		case 4: // Float
 			type = ClassFileConstant.ClassFileConstantType.Float;
-			constant = new ClassFileConstant(Float.intBitsToFloat(reader.findInt()));
+			constant = new ClassFileConstant(Float.intBitsToFloat(reader.nextInt()));
 			break;
 		case 5: // Long
 			type = ClassFileConstant.ClassFileConstantType.Long;
-			constant = new ClassFileConstant(reader.findLong());
+			constant = new ClassFileConstant(reader.nextLong());
 			break;
 		case 6: // Double
 			type = ClassFileConstant.ClassFileConstantType.Double;
-			constant = new ClassFileConstant(Double.longBitsToDouble(reader.findLong()));
+			constant = new ClassFileConstant(Double.longBitsToDouble(reader.nextLong()));
 			break;
 		case 9: // FieldRef
 			type = ClassFileConstant.ClassFileConstantType.FieldRef;
-			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort(), reader.nextShort());
 			break;
 		case 10: // MethodRef
 			type = ClassFileConstant.ClassFileConstantType.MethodRef;
-			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort(), reader.nextShort());
 			break;
 		case 11: // InterfaceMethodRef
 			type = ClassFileConstant.ClassFileConstantType.InterfaceMethodRef;
-			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort(), reader.nextShort());
 			break;
 		case 12: // NameAndType
 			type = ClassFileConstant.ClassFileConstantType.NameAndType;
-			constant = new ClassFileConstant(reader.findShort(), reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort(), reader.nextShort());
 			break;
 		case 7: // Class
 			type = ClassFileConstant.ClassFileConstantType.Class;
-			constant = new ClassFileConstant(reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort());
 			break;
 		case 8: // String
 			type = ClassFileConstant.ClassFileConstantType.String;
-			constant = new ClassFileConstant(reader.findShort());
+			constant = new ClassFileConstant(reader.nextShort());
 			break;
 		default:
 			String message = "Found [" + byteType + "] but expected any of [01,03,04,05,06,07,08,09,0A,0B,0C] at Position "

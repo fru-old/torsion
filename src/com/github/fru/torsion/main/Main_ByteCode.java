@@ -15,6 +15,7 @@ import com.github.fru.torsion.bytecode.parser.ConstantOperation;
 import com.github.fru.torsion.bytecode.parser.ConversionOperation;
 import com.github.fru.torsion.bytecode.parser.GotoOperation;
 import com.github.fru.torsion.bytecode.parser.InvocationOperation;
+import com.github.fru.torsion.bytecode.parser.OtherOperation;
 import com.github.fru.torsion.bytecode.parser.PrimitiveOperation;
 import com.github.fru.torsion.bytecode.parser.StackOperation;
 import com.github.fru.torsion.bytecode.parser.TypeDependentOperation;
@@ -22,7 +23,7 @@ import com.github.fru.torsion.bytecode.parser.TypeDependentOperation;
 public class Main_ByteCode {
 
 	public static void main(String... args) throws Exception {
-		HashMap<AccessibleObject, Body> result = ClassFile.parse(A.class);
+		HashMap<AccessibleObject, Body> result = ClassFile.parse(C.class);
 		for(AccessibleObject o : result.keySet()){
 			System.out.println("+++ "+o+" +++");
 			System.out.println(result.get(o).toString());
@@ -42,8 +43,9 @@ public class Main_ByteCode {
 	    		new GotoOperation(stack, constants, body, clazz),
 	    		new TypeDependentOperation(stack, constants, body, clazz),
 	    		new PrimitiveOperation(stack, constants, body, clazz),
+	    		new OtherOperation(stack, constants, body, clazz)
 	    };
-		for(int b = 0; b < 255; b++){
+		for(int b = 0; b < 0xCA; b++){
 			boolean print = true;
 			for(AbstractParser p : parsers)if(p.isApplicable(b))print=false;
 			if(print)System.out.println("TODO: 0x"+Integer.toHexString(b));

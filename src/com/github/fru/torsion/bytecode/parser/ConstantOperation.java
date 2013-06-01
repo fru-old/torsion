@@ -33,14 +33,14 @@ public class ConstantOperation extends Body.AbstractParser{
 		}else if(bytecode == 0x0E || bytecode == 0x0F){
 			constant.type.con(new Double(bytecode-0x0E));
 		}else if(bytecode == 0x10){
-			constant.type.con(new Integer(byteStream.findNext()));
+			constant.type.con(new Integer(byteStream.nextByte()));
 		}else if(bytecode == 0x11){
-			constant.type.con(new Integer(byteStream.findShort()));
+			constant.type.con(new Integer(byteStream.nextShort()));
 		}else if(bytecode == 0x12){
-			int index = byteStream.findNext();
+			int index = byteStream.nextByte();
 			constant.type.con(getConstant(index));
 		}else if(bytecode == 0x13 || bytecode == 0x14){
-			int index = byteStream.findShort();
+			int index = byteStream.nextShort();
 			constant.type.con(getConstant(index));
 		}
 		stack.push(constant);
