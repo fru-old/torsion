@@ -11,5 +11,9 @@ public class C {
 		if(o instanceof String)return (String)o;
 		return null;
 	}
+	
+	public void accessab(){
+		Object o = C.class;
+	}
 
 }

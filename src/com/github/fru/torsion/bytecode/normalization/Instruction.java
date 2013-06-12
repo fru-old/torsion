@@ -18,6 +18,10 @@ public class Instruction {
 	
 	private final ArrayList<Identifier> parameter = new ArrayList<Identifier>();
 	
+	public ArrayList<Identifier> getParameter(){
+		return parameter;
+	}
+	
 	public String toString(){
 		if(parameter.size() > 0){
 			StringBuilder out = new StringBuilder();

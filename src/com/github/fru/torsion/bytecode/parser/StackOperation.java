@@ -22,7 +22,7 @@ public class StackOperation extends Body.AbstractParser{
 		boolean isWide = 0xC4 == bytecode;
 		if(isWide)bytecode = byteStream.nextByte();
 		boolean isLoad = 0x15 <= bytecode && bytecode <= 0x35;
-		if(!isLoad)bytecode = bytecode - 0x20;
+		if(!isLoad)bytecode = bytecode - 0x21; //TODO check correct?
 		
 		if(0x15 <= bytecode && bytecode <= 0x19){
 			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();

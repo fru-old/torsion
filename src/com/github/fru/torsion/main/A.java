@@ -16,7 +16,6 @@ public class A {
 		return i+j;
 	}
 	
-	//TODO add manual test with description of this and parameter locations and result value standards...
 	public int inc(int i){
 		return add(i,345);
 	}

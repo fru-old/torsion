@@ -23,9 +23,13 @@ public class Identifier {
 
 	public static AccessibleObject parseMethod(String name, Class<?> clazz, Class<?>[] signature) throws NoSuchMethodException, SecurityException{
 		if(name.equals("<init>")){
-			return clazz.getConstructor(signature);
+			try{
+				return clazz.getConstructor(signature);
+			}catch(Exception e){
+				throw new RuntimeException("Private classes are not allowed.");
+			}
 		}else{
-			return clazz.getMethod(name, signature);
+			return clazz.getDeclaredMethod(name, signature);
 		}
 	}
 	
@@ -129,13 +133,28 @@ public class Identifier {
 		public String toString(){
 			return "local "+local;
 		}
+		
+		@Override
+		public boolean equals(Object o){
+			if(!(o instanceof LocalVariable))return false;
+			LocalVariable other = (LocalVariable)o;
+			return this.local == other.local;
+		}
+		
+		@Override
+		public int hashCode(){
+			return 34543+local;
+		}
 	}
 	
 	@Override
 	public boolean equals(Object o){
 		if(!(o instanceof Identifier))return false;
 		Identifier other = (Identifier)o;
-		return this.accessible == other.accessible && this.id == other.id;
+		if(this.accessible != other.accessible)return false;
+		if(this.id != null && !this.id.equals(other.id))return false;
+		if(this.id == null && other.id != null)return false;
+		return true;
 	}
 	
 	@Override

@@ -32,6 +32,15 @@ public class Type {
 		return this;
 	}
 	
+	public boolean isConstant(){
+		return constants != null && constants.size() > 0;
+	}
+	
+	public String getConstantValue(){
+		if(constants.get(0) == null)return "null";
+		return constants.get(0).toString();
+	}
+	
 	public String toString(){
 		return ""+(classes!=null?classes:"")+(constants!=null?constants:"")+(assignedFromVars!=null?assignedFromVars:"");
 	}
