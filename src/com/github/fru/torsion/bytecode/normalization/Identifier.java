@@ -96,6 +96,7 @@ public class Identifier {
 	
 	public Identifier(String name, String clazz, String signature){
 		try{
+			System.out.println(clazz);
 			Class<?> c = Class.forName(clazz.replace('/', '.'));
 			this.accessible = parseMethod(name, c, parseMethodSignatureConstant(signature));
 			this.id = null;

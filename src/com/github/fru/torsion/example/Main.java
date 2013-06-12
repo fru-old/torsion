@@ -5,10 +5,10 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import com.github.fru.torsion.buildin.Js;
 import com.github.fru.torsion.buildin.JsOutDefault;
 import com.github.fru.torsion.buildin.JsNaming;
 import com.github.fru.torsion.bytecode.normalization.Body;
+import com.github.fru.torsion.javascript.Js;
 
 @Js(global=true,name="Main")
 public class Main extends JsOutDefault{

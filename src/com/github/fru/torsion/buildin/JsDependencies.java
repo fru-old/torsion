@@ -16,7 +16,6 @@ public class JsDependencies {
 	String url;
 	JsDependencies[] dependencies;
 	
-	
 	public JsDependencies(int priority, String url, JsDependencies... dependencies){
 		this.priority = priority;
 		this.url = url;

@@ -6,6 +6,7 @@ import java.lang.reflect.AccessibleObject;
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.example.Main;
+import com.github.fru.torsion.javascript.Js;
 import com.github.fru.torsion.main.TorsionOut;
 import com.github.fru.torsion.main.TorsionOutDefault;
 

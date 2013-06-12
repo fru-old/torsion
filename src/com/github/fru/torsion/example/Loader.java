@@ -1,8 +1,8 @@
 package com.github.fru.torsion.example;
 
-import com.github.fru.torsion.buildin.Js;
-import com.github.fru.torsion.buildin.JsNative;
 import com.github.fru.torsion.example.Action.Arg3;
+import com.github.fru.torsion.javascript.Js;
+import com.github.fru.torsion.javascript.JsNative;
 
 @Js(global = true, name = "Loader")
 public abstract class Loader {

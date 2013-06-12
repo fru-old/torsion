@@ -5,6 +5,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.javascript.Js;
 
 public class JsNaming {
 

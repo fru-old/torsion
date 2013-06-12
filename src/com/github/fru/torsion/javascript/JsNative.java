@@ -1,4 +1,4 @@
-package com.github.fru.torsion.buildin;
+package com.github.fru.torsion.javascript;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
