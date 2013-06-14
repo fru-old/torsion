@@ -16,7 +16,8 @@ public abstract class JsWriterInstruction implements JsWriter{
 	protected abstract String getLocal(AccessibleObject parent, Identifier id);
 	protected abstract String getName(AnnotatedElement annotated);
 
-	public void writeAccessible(PrintWriter out, AccessibleObject accessible, Body body){
+	@Override
+	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, Body body){
 		boolean isStatic = accessible instanceof Method && Modifier.isStatic(((Method)accessible).getModifiers());
 		LinkedHashSet<Identifier> identifiers = new LinkedHashSet<Identifier>();
 		for(Instruction ins : body.body){

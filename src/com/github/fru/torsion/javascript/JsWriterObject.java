@@ -66,7 +66,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 	 * Writer
 	 */
 	
-	public void writeObjects(PrintWriter out){
+	public void writeObjects(PrintWriter out, JsWriterModule defaultWriter){
 		for(Class<?> clazz : result.keySet()){
 			String cname = getName(clazz);
 			out.print("function ");
@@ -84,11 +84,11 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 			} catch (IllegalAccessException e) {
 				//Intended fall through
 			}
-			writeObject(out, clazz, writer);
+			writeObject(out, defaultWriter, clazz, writer);
 		}
 	}
 	
-	private void writeObject(PrintWriter out, Class<?> clazz, JsWriter writer){
+	private void writeObject(PrintWriter out,JsWriterModule defaultWriter, Class<?> clazz, JsWriter writer){
 		Class<?> s = replacement(clazz.getSuperclass());
 		String sname = "Object";
 		if(result.containsKey(s))sname = getName(s);
@@ -103,7 +103,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 			out.print(getMethodName(accessible,true));
 			out.print("=function(");
 			out.println("){");
-			this.writeAccessible(out, accessible, accessibles.get(accessible));
+			this.writeAccessible(out, defaultWriter, accessible, accessibles.get(accessible));
 			out.println("};");
 		}
 	}

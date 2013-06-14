@@ -10,12 +10,13 @@ import java.util.HashSet;
 
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.main.D;
+import com.github.fru.torsion.main.E;
 
 public class JsWriterModule extends JsWriterObject{
 	
 	public static void main(String... args) throws IOException{
 		JsWriterModule torsion = new JsWriterModule();
-		torsion.registerClass(D.class);
+		torsion.registerClass(E.class);
 		PrintWriter out = new PrintWriter(System.out);
 		torsion.write(out);
 		out.flush();
@@ -24,7 +25,7 @@ public class JsWriterModule extends JsWriterObject{
 	public void write(PrintWriter out){
 		out.println("(function(window){ /*global window*/");
 		out.println("  \"use strict\";");
-		this.writeObjects(out);
+		this.writeObjects(out, this);
 		
 		//main.outTypeDefinition(out, main.getClass());
 		out.println("})(window);");
@@ -116,12 +117,5 @@ public class JsWriterModule extends JsWriterObject{
 	protected Class<?> replacement(Class<?> accessible) {
 		if(accessible == Integer.class)return int.class;
 		return accessible;
-	}
-
-	@Override
-	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter,
-			AccessibleObject accessible, Body body) {
-		//TODO
-		
 	}
 }
