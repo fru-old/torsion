@@ -40,14 +40,13 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 			if(!(a instanceof Member))throw new RuntimeException(a+" is no Member");
 			Member memA = (Member)a;
 			if(a.getAnnotation(Js.class) != null){
-				if(!Modifier.isStatic(memA.getModifiers())){
-					throw new RuntimeException(a+ " is not static and hence can not be annotated with @Js");
+				if(Modifier.isStatic(memA.getModifiers())){
+					throw new RuntimeException(a+ " is static and hence can not be annotated with @Js");
 				}
 				annotated.add(a);
 			}
 			Class<?> clazzA = memA.getDeclaringClass();
 			if(!result.containsKey(clazzA)){
-				System.out.println("!"+clazzA);
 				result.put(clazzA, ClassFile.parse(clazzA));
 			}
 			Body b = result.get(clazzA).get(a);
@@ -61,6 +60,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 	}
 	
 	protected abstract AccessibleObject replacement(AccessibleObject accessible);
+	protected abstract Class<?> replacement(Class<?> clazz);
 	
 	/*
 	 * Writer
@@ -89,10 +89,18 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 	}
 	
 	private void writeObject(PrintWriter out, Class<?> clazz, JsWriter writer){
-		//TODO add parameter
+		Class<?> s = replacement(clazz.getSuperclass());
+		String sname = "Object";
+		if(result.containsKey(s))sname = getName(s);
+		out.print(getName(clazz));
+		out.print(".prototype=new ");
+		out.print(sname);
+		out.println("();");
+		
+		//TODO add parameter _1
 		HashMap<AccessibleObject, Body> accessibles = result.get(clazz);
 		for(AccessibleObject accessible : accessibles.keySet()){
-			out.print(getFullName(accessible));
+			out.print(getMethodName(accessible,true));
 			out.print("=function(");
 			out.println("){");
 			this.writeAccessible(out, accessible, accessibles.get(accessible));
@@ -101,7 +109,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 	}
 	
 	@Override
-	public void writeInvocation(PrintWriter out, AccessibleObject called, Identifier... parameter) {
+	public void writeInvocation(PrintWriter out, JsWriterModule defaultWriter,  AccessibleObject accessible, AccessibleObject called, Identifier... parameter) {
 		//TODO
 	}
 	
@@ -112,12 +120,13 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 	private final HashMap<AnnotatedElement, String> names = new HashMap<AnnotatedElement, String>();
 	private final HashMap<AccessibleObject, HashMap<Identifier, String>> locals = new HashMap<AccessibleObject, HashMap<Identifier,String>>();
 	
-	protected String getFullName(AccessibleObject accessible){
-		//TODO
-		return getName(accessible);
+	protected String getMethodName(AccessibleObject accessible, boolean prototype){
+		if(!(accessible instanceof Member))throw new RuntimeException(accessible+" should be Member");
+		Class<?> clazz = ((Member)accessible).getDeclaringClass();
+		return getName(clazz) + (prototype?".prototype.":".") + getName(accessible);
 	}
 	
-	protected String getName(AnnotatedElement annotated){
+	public String getName(AnnotatedElement annotated){
 		if(names.containsKey(annotated))return names.get(annotated);
 		Js a = annotated.getAnnotation(Js.class);
 		String newName;
@@ -130,7 +139,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 		return newName;
 	}
 	
-	protected String getLocal(AccessibleObject parent, Identifier id){
+	public String getLocal(AccessibleObject parent, Identifier id){
 		if(!locals.containsKey(parent))locals.put(parent, new HashMap<Identifier, String>());
 		HashMap<Identifier, String> map = locals.get(parent);
 		if(map.containsKey(id))return map.get(id);

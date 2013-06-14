@@ -8,11 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 
-import com.github.fru.torsion.buildin.JsDependencies;
-import com.github.fru.torsion.buildin.JsNaming;
-import com.github.fru.torsion.example.Action;
-import com.github.fru.torsion.example.Loader;
-import com.github.fru.torsion.example.Main;
+import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.main.D;
 
 public class JsWriterModule extends JsWriterObject{
@@ -81,7 +77,7 @@ public class JsWriterModule extends JsWriterObject{
 			batch.clear();
 		}
 		
-		try {
+		/*try {
 			//TODO no direct link
 			String load = JsNaming.getName(Loader.class)+"."+JsNaming.getName(Loader.class.getMethod("load", String[][].class, Action.Arg0.class));
 			String main = JsNaming.getName(Main.class)+"()."+JsNaming.getName(Main.class.getMethod("main"));
@@ -94,7 +90,7 @@ public class JsWriterModule extends JsWriterObject{
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	private void iterate(ArrayList<Dependency> batch, HashSet<String> doneUrls, Dependency current){
@@ -114,5 +110,18 @@ public class JsWriterModule extends JsWriterObject{
 	@Override
 	protected AccessibleObject replacement(AccessibleObject accessible) {
 		return accessible;
+	}
+	
+	@Override
+	protected Class<?> replacement(Class<?> accessible) {
+		if(accessible == Integer.class)return int.class;
+		return accessible;
+	}
+
+	@Override
+	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter,
+			AccessibleObject accessible, Body body) {
+		//TODO
+		
 	}
 }

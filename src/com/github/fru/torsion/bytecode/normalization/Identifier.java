@@ -24,6 +24,8 @@ public class Identifier {
 	public static AccessibleObject parseMethod(String name, Class<?> clazz, Class<?>[] signature) throws NoSuchMethodException, SecurityException{
 		if(name.equals("<init>")){
 			try{
+				System.out.println(clazz);
+				System.out.println(signature);
 				return clazz.getConstructor(signature);
 			}catch(Exception e){
 				throw new RuntimeException("Private classes are not allowed.");
@@ -96,7 +98,6 @@ public class Identifier {
 	
 	public Identifier(String name, String clazz, String signature){
 		try{
-			System.out.println(clazz);
 			Class<?> c = Class.forName(clazz.replace('/', '.'));
 			this.accessible = parseMethod(name, c, parseMethodSignatureConstant(signature));
 			this.id = null;

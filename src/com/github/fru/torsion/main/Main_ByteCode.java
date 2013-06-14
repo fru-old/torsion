@@ -1,18 +1,9 @@
 package com.github.fru.torsion.main;
 
-import java.io.PrintWriter;
-import java.lang.reflect.AccessibleObject;
-import java.util.HashMap;
-
-import com.github.fru.torsion.buildin.JsBody;
-import com.github.fru.torsion.buildin.JsDependencies;
-import com.github.fru.torsion.buildin.JsOutDefault;
-import com.github.fru.torsion.bytecode.ClassFile;
-import com.github.fru.torsion.bytecode.normalization.Body;
-import com.github.fru.torsion.bytecode.normalization.Identifier;
 
 public class Main_ByteCode {
 
+	/*
 	public static void main1(String... args) throws Exception {
 		HashMap<AccessibleObject, Body> result = ClassFile.parse(D.class);
 		for (AccessibleObject o : result.keySet()) {
@@ -28,7 +19,7 @@ public class Main_ByteCode {
 		/*
 		 * for(int i = 0; i < 2; i++){
 		 * System.out.println(toIdentifier(26*36*36-i)); }
-		 */
+		 
 	}
 
 	public static void main(String... args) {
@@ -44,5 +35,5 @@ public class Main_ByteCode {
 		Torsion.parse(new JsOutDefault(), writer);
 
 		writer.flush();
-	}
+	}*/
 }

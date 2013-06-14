@@ -2,16 +2,19 @@ package com.github.fru.torsion.javascript;
 
 import java.io.PrintWriter;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
 
-import com.github.fru.torsion.buildin.JsNaming;
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
 
 public abstract class JsWriterInstruction implements JsWriter{
+	
+	protected abstract String getLocal(AccessibleObject parent, Identifier id);
+	protected abstract String getName(AnnotatedElement annotated);
 
 	public void writeAccessible(PrintWriter out, AccessibleObject accessible, Body body){
 		boolean isStatic = accessible instanceof Method && Modifier.isStatic(((Method)accessible).getModifiers());
@@ -27,7 +30,7 @@ public abstract class JsWriterInstruction implements JsWriter{
 			Object v0 = new Identifier.LocalVariable(0);
 			for(Identifier i : identifiers){
 				j += 1;
-				out.print(JsNaming.getLocal(accessible, i));
+				out.print(this.getLocal(accessible, i));
 				if(i.type.isConstant()){
 					out.print("=");
 					out.print(i.type.getConstantValue());
@@ -48,27 +51,27 @@ public abstract class JsWriterInstruction implements JsWriter{
 		}
 	}
 	
-	private static void simpleInstruction(PrintWriter out, Instruction i, AccessibleObject accessible){
+	private void simpleInstruction(PrintWriter out, Instruction i, AccessibleObject accessible){
 		String o = i.operation;
 		if(o.equals("return")){
 			if(i.getParameter().size()>0){
 				out.print("return ");
-				out.print(JsNaming.getLocal(accessible, i.getParameter().get(0)));
+				out.print(this.getLocal(accessible, i.getParameter().get(0)));
 				out.println(";");
 			}else{
 				out.println("return;");
 			}
 		}else if(o.equals("=")){
-			out.print(JsNaming.getLocal(accessible, i.getParameter().get(0)));
+			out.print(this.getLocal(accessible, i.getParameter().get(0)));
 			out.print("=");
-			out.print(JsNaming.getLocal(accessible, i.getParameter().get(1)));
+			out.print(this.getLocal(accessible, i.getParameter().get(1)));
 			out.println(";");
 		}else if(o.equals("+") || o.equals("-")){
-			out.print(JsNaming.getLocal(accessible, i.getParameter().get(0)));
+			out.print(this.getLocal(accessible, i.getParameter().get(0)));
 			out.print("=");
-			out.print(JsNaming.getLocal(accessible, i.getParameter().get(1)));
+			out.print(this.getLocal(accessible, i.getParameter().get(1)));
 			out.print(i.operation);
-			out.print(JsNaming.getLocal(accessible, i.getParameter().get(2)));
+			out.print(this.getLocal(accessible, i.getParameter().get(2)));
 			out.println(";");
 		}
 	}

@@ -6,12 +6,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import com.github.fru.torsion.buildin.JsOutDefault;
-import com.github.fru.torsion.buildin.JsNaming;
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.javascript.JsWriter;
+import com.github.fru.torsion.javascript.JsWriterModule;
 
-public class Action extends JsOutDefault{
+public class Action implements JsWriter{
 	
 	public static class Arg0 extends Action{
 		public Arg0(String name){};
@@ -47,17 +47,38 @@ public class Action extends JsOutDefault{
 		public Arg1<D> curry(A a, B b, C c){return null;}
 		public Arg0 curry(A a, B b, C c, D d){return null;}
 	}
+	
+	private Method getMethod(String name){
+		try{
+			int l = name.lastIndexOf('.');
+			String clazz = name.substring(0,l);
+			String method = name.substring(l-1);
+			for(Method m : Class.forName(clazz).getMethods()){
+				if(m.getName().equals(method)){
+					return m;
+				}
+			}
+		}catch(Exception e){
+			//intentional fall through
+		}
+		throw new RuntimeException(name + " is not a valid static method.");
+	}
 
 	@Override
-	public void outCallDefinition(PrintWriter out, AccessibleObject accessable, AccessibleObject called,
-			Identifier... identifier) {
+	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, Body body) {
+		//empty intentionally
+	}
+
+	@Override
+	public void writeInvocation(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, AccessibleObject called,
+			Identifier... parameter) {
 		if(called instanceof Constructor){
 			//TODO
 			//if(identifier.length > 1 && identifier[1].type.isConstant()){
 			Method m = getMethod("constant");
 			if(Modifier.isStatic(m.getModifiers())){
-				String ret = JsNaming.getLocal(accessable, identifier[0]);
-				String value = JsNaming.getName(m.getClass())+"."+JsNaming.getName(m);
+				String ret = defaultWriter.getLocal(accessible, parameter[0]);
+				String value = defaultWriter.getName(m.getClass())+"."+defaultWriter.getName(m);
 				
 				out.println(ret+"="+value+";");
 				return;
@@ -74,26 +95,6 @@ public class Action extends JsOutDefault{
 			}
 		}
 		throw new RuntimeException("Action class could not be called correctly.");
-	}
-	
-	@Override
-	public void outBodyDefinition(PrintWriter out, AccessibleObject accessable, Body body) {
-		//empty intentionally
-	}
-	
-	private Method getMethod(String name){
-		try{
-			int l = name.lastIndexOf('.');
-			String clazz = name.substring(0,l);
-			String method = name.substring(l-1);
-			for(Method m : Class.forName(clazz).getMethods()){
-				if(m.getName().equals(method)){
-					return m;
-				}
-			}
-		}catch(Exception e){
-			//intentional fall through
-		}
-		throw new RuntimeException(name + " is not a valid static method.");
+		
 	}
 }
