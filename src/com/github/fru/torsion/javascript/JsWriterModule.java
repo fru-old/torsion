@@ -1,35 +1,34 @@
 package com.github.fru.torsion.javascript;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 
-import com.github.fru.torsion.bytecode.normalization.Body;
-import com.github.fru.torsion.main.D;
-import com.github.fru.torsion.main.E;
-
 public class JsWriterModule extends JsWriterObject{
-	
-	public static void main(String... args) throws IOException{
-		JsWriterModule torsion = new JsWriterModule();
-		torsion.registerClass(E.class);
-		PrintWriter out = new PrintWriter(System.out);
-		torsion.write(out);
-		out.flush();
-	}
 	
 	public void write(PrintWriter out){
 		out.println("(function(window){ /*global window*/");
 		out.println("  \"use strict\";");
 		this.writeObjects(out, this);
-		
+			
 		//main.outTypeDefinition(out, main.getClass());
 		out.println("})(window);");
 		//JsDependencies.printMainFooter(out);
+		
+		for(AccessibleObject ac : annotated){
+			Member m = (Member)ac;
+			out.print("new ");
+			out.print(getName(m.getDeclaringClass()));
+			out.print("().");
+			out.print(getName(ac));
+			out.print("();");
+		}
 	}
 	
 	/*
@@ -107,15 +106,29 @@ public class JsWriterModule extends JsWriterObject{
 	/*
 	 * Replacement
 	 */
+	
+	public static HashMap<Class<?>, Class<?>> replacements = new HashMap<Class<?>, Class<?>>();
 
 	@Override
 	protected AccessibleObject replacement(AccessibleObject accessible) {
+		if(!(accessible instanceof Member))return accessible;
+		Class<?> clazz = ((Member)accessible).getDeclaringClass();
+		clazz = replacements.containsKey(clazz) ? replacements.get(clazz) : clazz;
+		if(accessible instanceof Method){
+			Method m = ((Method)accessible);
+			try {
+				return clazz.getMethod(m.getName(), m.getParameterTypes());
+			} catch (Exception e) {
+			}
+		}
+		
 		return accessible;
 	}
 	
 	@Override
 	protected Class<?> replacement(Class<?> accessible) {
-		if(accessible == Integer.class)return int.class;
-		return accessible;
+		Class<?> out = replacements.containsKey(accessible) ? replacements.get(accessible) : accessible;
+		if(out.getAnnotation(Js.class)==null)throw new RuntimeException(out + " has no @Js Annotation.");
+		return out;
 	}
 }

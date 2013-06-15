@@ -10,8 +10,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import com.github.fru.torsion.bytecode.ClassFile;
+import com.github.fru.torsion.bytecode.normalization.Block;
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
@@ -51,10 +53,17 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 			}
 			Body b = result.get(clazzA).get(a);
 			if(b != null)
-			for(Instruction i : b.body){
-				for(Identifier id : i.getParameter()){
-					if(id.accessible != null)translate.add(id.accessible);
-				}
+			fillTranslate(b.body);
+		}
+	}
+	
+	private void fillTranslate(List<Instruction> instructions){
+		for(Instruction i : instructions){
+			if(i instanceof Block){
+				fillTranslate(((Block)i).body);
+			}
+			for(Identifier id : i.getParameter()){
+				if(id.accessible != null)translate.add(id.accessible);
 			}
 		}
 	}
@@ -106,11 +115,84 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 			this.writeAccessible(out, defaultWriter, accessible, accessibles.get(accessible));
 			out.println("};");
 		}
+		
+		if(clazz.getAnnotation(Js.class).global()){
+			out.print("window.");
+			out.print(getName(clazz));
+			out.print("=");
+			out.print(getName(clazz));
+			out.println(";");
+		}
 	}
 	
 	@Override
 	public void writeInvocation(PrintWriter out, JsWriterModule defaultWriter,  AccessibleObject accessible, AccessibleObject called, Identifier... parameter) {
-		//TODO
+		called = this.replacement(called);
+		JsNative n = called.getAnnotation(JsNative.class);
+		if(n != null) {
+			for(String s : n.inline()){
+				boolean foundAt = false;
+				for(char c : s.toCharArray()){
+					if(c == '@'){
+						foundAt = true;
+					}else if(foundAt && c>='0' && c <= '9'){
+						out.print(getLocal(accessible, parameter[c-'0']));
+					}else{
+						out.print(c);
+					}
+				}
+				out.println();
+				//TODO implement real templates
+			}
+		}else{
+			if(called instanceof Method){
+				int mod = ((Method)called).getModifiers();
+				boolean returns = Void.class != ((Method)called).getReturnType();
+				if(Modifier.isStatic(mod)){
+					if(returns){
+						out.print(getLocal(accessible, parameter[0]));
+						out.print("=");
+					}
+					Class<?> clazz = ((Member)called).getDeclaringClass();
+					out.print(getName(clazz));
+					out.print(".prototype.");
+					out.print(getName(called));
+
+					out.print("(");
+					boolean first = true;
+					for(int i = returns?2:1; i < parameter.length; i++){
+						if(!first){
+							out.print(",");
+						}else{
+							first = false;
+						}
+						out.print(getLocal(accessible, parameter[i]));
+					}
+					out.println(");");
+				}else{
+					if(returns){
+						out.print(getLocal(accessible, parameter[0]));
+						out.print("=");
+					}
+					out.print(getLocal(accessible, parameter[2]));
+					out.print(".");
+					out.print(getName(called));
+					out.print("(");
+					boolean first = true;
+					for(int i = 3; i < parameter.length; i++){
+						if(!first){
+							out.print(",");
+						}else{
+							first = false;
+						}
+						out.print(getLocal(called, parameter[i]));
+					}
+					out.println(");");
+				}
+			}
+			
+			
+		}
 	}
 	
 	/*

@@ -24,8 +24,6 @@ public class Identifier {
 	public static AccessibleObject parseMethod(String name, Class<?> clazz, Class<?>[] signature) throws NoSuchMethodException, SecurityException{
 		if(name.equals("<init>")){
 			try{
-				System.out.println(clazz);
-				System.out.println(signature);
 				return clazz.getConstructor(signature);
 			}catch(Exception e){
 				throw new RuntimeException("Private classes are not allowed.");
@@ -185,11 +183,11 @@ public class Identifier {
 	
 	//Normalization: Operation StackAssignment
 
-	public static void main(String[] args) throws Exception {
+	/*public static void main(String[] args) throws Exception {
 		parseMethodSignatureConstant("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
 		System.out.println(Class.forName("java.lang.Integer"));
 		System.out.println(Class.forName("java.lang.Integer").getMethod("toString", parseMethodSignatureConstant("()Ljava/lang/String;")));
 		System.out.println(B.class.getMethod("test", parseMethodSignatureConstant("(Ljava/lang/Object;Ljava/lang/Object;II)Ljava/lang/String;")));
 		System.out.println(B.class.getDeclaredField("a"));
-	}
+	}*/
 }

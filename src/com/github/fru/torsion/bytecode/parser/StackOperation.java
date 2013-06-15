@@ -21,21 +21,8 @@ public class StackOperation extends Body.AbstractParser{
 	public void parse(int bytecode, ByteInputStream byteStream, int location) throws EOFException {
 		boolean isWide = 0xC4 == bytecode;
 		if(isWide)bytecode = byteStream.nextByte();
-		boolean isLoad = 0x15 <= bytecode && bytecode <= 0x35;
-		if(!isLoad)bytecode = bytecode - 0x21; //TODO check correct?
 		
-		if(0x15 <= bytecode && bytecode <= 0x19){
-			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();
-			Class<?> type = StackOperation.getBasicType(bytecode-0x15);
-			producePrimitive(location, type, local,isLoad);
-		}else if(0x1A <= bytecode && bytecode <= 0x2D ){
-			int local = (bytecode-0x1A) % 4;
-			Class<?> type = StackOperation.getBasicType((bytecode-0x1A) / 4);
-			producePrimitive(location, type, local,isLoad);
-		}else if(0x2E <= bytecode && bytecode <= 0x35){
-			Class<?> type = StackOperation.getBasicType(bytecode-0x2E);
-			produceArray(location,type,isLoad);
-		}else if(bytecode == 0x84){
+		if(bytecode == 0x84){
 			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();
 			Instruction i = new Instruction(location,"+");
 			Identifier l = new Identifier(new Identifier.LocalVariable(local));
@@ -48,6 +35,21 @@ public class StackOperation extends Body.AbstractParser{
 			i.add(l).add(c).add(l);
 			body.add(i);
 			return;
+		}
+		
+		boolean isLoad = 0x15 <= bytecode && bytecode <= 0x35;
+		if(!isLoad)bytecode = bytecode - 0x21; //TODO check correct?
+		if(0x15 <= bytecode && bytecode <= 0x19){
+			int local = isWide ? byteStream.nextShort() : byteStream.nextByte();
+			Class<?> type = StackOperation.getBasicType(bytecode-0x15);
+			producePrimitive(location, type, local,isLoad);
+		}else if(0x1A <= bytecode && bytecode <= 0x2D ){
+			int local = (bytecode-0x1A) % 4;
+			Class<?> type = StackOperation.getBasicType((bytecode-0x1A) / 4);
+			producePrimitive(location, type, local,isLoad);
+		}else if(0x2E <= bytecode && bytecode <= 0x35){
+			Class<?> type = StackOperation.getBasicType(bytecode-0x2E);
+			produceArray(location,type,isLoad);
 		}
 	}
 	
