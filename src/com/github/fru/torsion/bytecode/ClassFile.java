@@ -6,8 +6,8 @@ import java.lang.reflect.AccessibleObject;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.normalization.Block;
-import com.github.fru.torsion.bytecode.normalization.Identifier;
 import com.github.fru.torsion.bytecode.normalization.Body;
+import com.github.fru.torsion.bytecode.normalization.Identifier;
 
 public class ClassFile {
 	

@@ -13,6 +13,7 @@ public class C {
 	}
 	
 	public void accessab(){
+		@SuppressWarnings("unused")
 		Object o = C.class;
 	}
 

@@ -11,6 +11,10 @@ public class Type {
 		return this;
 	}
 	
+	public ArrayList<Class<?>> getClasses(){
+		return classes;
+	}
+	
 	ArrayList<Object> constants = null;
 	public Type con(Object constant){
 		if(constant instanceof String)constant = "\""+constant+"\"";

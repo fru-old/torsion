@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -111,8 +112,21 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 		for(AccessibleObject accessible : accessibles.keySet()){
 			out.print(getMethodName(accessible,true));
 			out.print("=function(");
+			Class<?>[] p = (accessible instanceof Method)?((Method)accessible).getParameterTypes():((Constructor<?>)accessible).getParameterTypes();
+			for(int i = 0; i < p.length; i++){
+				if(i != 0)out.print(",");
+				out.print("a_");
+				out.print(i);
+			}
 			out.println("){");
-			this.writeAccessible(out, defaultWriter, accessible, accessibles.get(accessible));
+			JsWriter w = this;
+			if(JsWriter.class.isAssignableFrom(clazz)){
+				try {
+					w = (JsWriter) clazz.newInstance();
+				} catch (Exception e) {
+				}
+			}
+			w.writeAccessible(out, defaultWriter, accessible, accessibles.get(accessible));
 			out.println("};");
 		}
 		
@@ -141,8 +155,7 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 						out.print(c);
 					}
 				}
-				out.println();
-				//TODO implement real templates
+				if(s.length() > 0)out.println();
 			}
 		}else{
 			if(called instanceof Method){
@@ -185,10 +198,26 @@ public abstract class JsWriterObject extends JsWriterInstruction{
 						}else{
 							first = false;
 						}
-						out.print(getLocal(called, parameter[i]));
+						out.print(getLocal(accessible, parameter[i]));
 					}
 					out.println(");");
 				}
+			}else if(called instanceof Constructor<?> && parameter.length > 0){
+				out.print(getLocal(accessible, parameter[1]));
+				out.print(".");
+				out.print(getName(called));
+				out.print("(");
+				boolean first = true;
+				for(int i = 2; i < parameter.length; i++){
+					if(!first){
+						out.print(",");
+					}else{
+						first = false;
+					}
+					out.print(getLocal(called, parameter[i]));
+				}
+				out.println(");");
+				//
 			}
 			
 			

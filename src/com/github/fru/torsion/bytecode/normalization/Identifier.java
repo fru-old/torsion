@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.github.fru.torsion.bytecode.ClassFileConstant;
-import com.github.fru.torsion.main.B;
 
 public class Identifier {
 	
@@ -29,7 +28,11 @@ public class Identifier {
 				throw new RuntimeException("Private classes are not allowed.");
 			}
 		}else{
-			return clazz.getDeclaredMethod(name, signature);
+			try{
+				return clazz.getDeclaredMethod(name, signature);
+			}catch(Exception e){
+				return clazz.getMethod(name, signature);
+			}
 		}
 	}
 	
@@ -124,7 +127,7 @@ public class Identifier {
 	}
 
 	public static class LocalVariable{
-		int local;
+		public final int local;
 		public LocalVariable(int local){
 			this.local = local;
 		}

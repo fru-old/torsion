@@ -59,6 +59,7 @@ public class Main_ByteCode {
 		JsWriterModule.replacements.put(Integer.class, Buildin.Number.class);
 		JsWriterModule.replacements.put(int.class, Buildin.Number.class);
 		JsWriterModule.replacements.put(String.class, Buildin.String.class);
+		JsWriterModule.replacements.put(StringBuilder.class, Buildin.String.class);
 		JsWriterModule.replacements.put(Boolean.class, Buildin.Boolean.class);
 		JsWriterModule.replacements.put(boolean.class, Buildin.Boolean.class);
 		

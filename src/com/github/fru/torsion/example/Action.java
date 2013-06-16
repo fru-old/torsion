@@ -4,16 +4,21 @@ import java.io.PrintWriter;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 import com.github.fru.torsion.bytecode.normalization.Body;
 import com.github.fru.torsion.bytecode.normalization.Identifier;
+import com.github.fru.torsion.javascript.Js;
+import com.github.fru.torsion.javascript.JsNative;
 import com.github.fru.torsion.javascript.JsWriter;
 import com.github.fru.torsion.javascript.JsWriterModule;
 
+@Js
 public class Action implements JsWriter{
 	
+	@Js
 	public static class Arg0 extends Action{
+		@Deprecated //TODO constructor needed? Not user friendly
+		public Arg0(){};
 		public Arg0(String name){};
 		public void call(){}
 	}
@@ -48,6 +53,7 @@ public class Action implements JsWriter{
 		public Arg0 curry(A a, B b, C c, D d){return null;}
 	}
 	
+	/*
 	private Method getMethod(String name){
 		try{
 			int l = name.lastIndexOf('.');
@@ -62,14 +68,36 @@ public class Action implements JsWriter{
 			//intentional fall through
 		}
 		throw new RuntimeException(name + " is not a valid static method.");
-	}
+	}*/
 
 	@Override
+	@JsNative()
 	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, Body body) {
 		//empty intentionally
 	}
-
+	
 	@Override
+	@JsNative()
+	public void writeInvocation(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, AccessibleObject called,
+			Identifier... parameter) {
+		if(called instanceof Constructor){
+			String s = parameter[2].type.getConstantValue();
+			s = s.substring(1, s.length()-1);
+			out.print(defaultWriter.getLocal(accessible, parameter[1]));
+			out.print("=this.");
+			out.print(s);
+			out.println(";");
+			//TODO this is not properly set for an action
+		}else if(called instanceof Method){
+			Method m = (Method)called;
+			if(m.getName().equals("call")){
+				out.print(defaultWriter.getLocal(accessible, parameter[2]));
+				out.println("();");
+			}
+		}
+	}
+
+	/*@Override
 	public void writeInvocation(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, AccessibleObject called,
 			Identifier... parameter) {
 		if(called instanceof Constructor){
@@ -96,5 +124,5 @@ public class Action implements JsWriter{
 		}
 		throw new RuntimeException("Action class could not be called correctly.");
 		
-	}
+	}*/
 }

@@ -65,7 +65,6 @@ public class InvocationOperation extends Body.AbstractParser{
 			ClassFileConstant nameAndType = constants.get(constant.getRef2());
 			String name = constants.get(nameAndType.getRef1()).getConstant();
 			String signature = constants.get(nameAndType.getRef2()).getConstant();
-			
 			Identifier accessable = new Identifier(name, clazz, signature);
 			Instruction i = new Instruction(location,bytecode==0xB7?"direct":"call");
 			

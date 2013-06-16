@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import com.github.fru.torsion.bytecode.normalization.Block;
 import com.github.fru.torsion.bytecode.normalization.Instruction;
-import com.github.fru.torsion.bytecode.normalization.Instruction.Jump;
 
 public class NormalizationTests {
 

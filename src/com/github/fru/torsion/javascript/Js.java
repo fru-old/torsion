@@ -8,5 +8,6 @@ public @interface Js {
 
 	boolean global() default false;
 	String name() default "";
+	String action() default "";
 	
 }
