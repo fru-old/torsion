@@ -48,7 +48,7 @@ public class Body {
 	    		for(AbstractParser parser : parsers){
 	    			if(parser.isApplicable(bytecode)){
 	    				try{
-	    					System.out.println(offset +": "+Integer.toHexString(bytecode));
+	    					//System.out.println(offset +": "+Integer.toHexString(bytecode));
 	    					//System.out.println(accessable);
 	    					parser.parse(bytecode, byteStream, offset);
 	    					//System.out.println(stack.size());

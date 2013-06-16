@@ -20,9 +20,12 @@ public abstract class JsWriterInstruction implements JsWriter{
 	protected abstract String getLocal(AccessibleObject parent, Identifier id);
 	protected abstract String getName(AnnotatedElement annotated);
 	
-	private void fillIdentifiers(LinkedHashSet<Identifier> identifiers, List<Instruction> instructions){
+	private void fillIdentifiers(LinkedHashSet<Identifier> identifiers, LinkedHashSet<Integer> targets, List<Instruction> instructions){
 		for(Instruction ins : instructions){
-			if(ins instanceof Block)fillIdentifiers(identifiers, ((Block)ins).body);
+			if(ins instanceof Jump && ((Jump)ins).isForward()){
+				targets.add(((Jump)ins).target);
+			}
+			if(ins instanceof Block)fillIdentifiers(identifiers, targets, ((Block)ins).body);
 			for(Identifier i : ins.getParameter()){
 				if(i.id != null)identifiers.add(i);
 			}
@@ -33,13 +36,22 @@ public abstract class JsWriterInstruction implements JsWriter{
 	public void writeAccessible(PrintWriter out, JsWriterModule defaultWriter, AccessibleObject accessible, Body body){
 		boolean isStatic = accessible instanceof Method && Modifier.isStatic(((Method)accessible).getModifiers());
 		LinkedHashSet<Identifier> identifiers = new LinkedHashSet<Identifier>();
-		fillIdentifiers(identifiers, body.body);
+		LinkedHashSet<Integer> targets = new LinkedHashSet<Integer>();
+		fillIdentifiers(identifiers, targets, body.body);
 		if(identifiers.size() > 0){
 			out.print("var ");
-			int j = 0;
+			boolean first = true;
+			for(Integer i : targets){
+				if(!first)out.print(",");
+				first = false;
+				out.print("cond_");
+				out.print(i);
+				out.print("=false");
+			}
 			Object v0 = new Identifier.LocalVariable(0);
 			for(Identifier i : identifiers){
-				j += 1;
+				if(!first)out.print(",");
+				first = false;
 				out.print(this.getLocal(accessible, i));
 				if(i.type.isConstant()){
 					out.print("=");
@@ -47,11 +59,6 @@ public abstract class JsWriterInstruction implements JsWriter{
 				}
 				if(!isStatic && v0.equals(i.id)){
 					out.print("=this");
-				}
-				
-				if(identifiers.size() > j){
-					out.print(",");
-					if(j % 20 == 0)out.println();
 				}
 			}
 			out.println(";");
@@ -63,29 +70,53 @@ public abstract class JsWriterInstruction implements JsWriter{
 	
 	private void allInstruction(PrintWriter out, Instruction i, AccessibleObject accessible, JsWriterModule defaultWriter){
 		if(i instanceof Block){
-			out.print("label_");
-			out.print(i.location);
-			out.println(":while(true){");
-			for(Instruction i2 : ((Block)i).body){
-				allInstruction(out, i2, accessible, defaultWriter);
+			Block b = ((Block)i);
+			if(b.forward){
+				out.print("if(!cond_");
+				out.print(b.location);
+				out.println("){");
+				for(Instruction i2 : b.body){
+					allInstruction(out, i2, accessible, defaultWriter);
+				}
+				out.println("}");
+				if(b.body.get(b.body.size()-1).location + 1 == b.location){
+					out.print("cond_");
+					out.print(b.location);
+					out.println("=false;");
+				}
+			}else{
+				out.print("label_");
+				out.print(i.location);
+				out.println(":while(true){");
+				for(Instruction i2 : b.body){
+					allInstruction(out, i2, accessible, defaultWriter);
+				}
+				out.println("break;");
+				out.println("}");
 			}
-			out.println("break;");
-			out.println("}");
 		}
-		if(i instanceof Jump && !((Jump)i).isForward()){
+		if(i instanceof Jump){
 			Jump j = (Jump)i;
-			if(j.getParameter().size() > 0){
-				out.print("if(");
+			if(j.isForward()){
+				out.print("cond_");
+				out.print(j.target);
+				out.print("=");
 				out.print(getLocal(accessible, j.getParameter().get(0)));
-				out.print("){");
+				out.println(";");
+			}else{
+				if(j.getParameter().size() > 0){
+					out.print("if(");
+					out.print(getLocal(accessible, j.getParameter().get(0)));
+					out.print("){");
+				}
+				out.print("continue label_");
+				out.print(j.target);
+				out.print(";");
+				if(j.getParameter().size() > 0){
+					out.print("}");
+				}
+				out.println();
 			}
-			out.print("continue label_");
-			out.print(j.target);
-			out.print(";");
-			if(j.getParameter().size() > 0){
-				out.print("}");
-			}
-			out.println();
 		}
 		
 		if(i.getParameter().size() >= 2){
@@ -123,7 +154,8 @@ public abstract class JsWriterInstruction implements JsWriter{
 			out.print("=");
 			out.print(this.getLocal(accessible, i.getParameter().get(1)));
 			out.println(";");
-		}else if(o.equals("+") || o.equals("-") || o.equals("/") || o.equals("*") || o.equals(">") || o.equals("<") || o.equals("%")){
+		}else if(o.equals("+") || o.equals("-") || o.equals("/") || o.equals("*") || 
+				o.equals(">") || o.equals("<") || o.equals("%") || o.equals(">=") || o.equals("<=")){
 			out.print(this.getLocal(accessible, i.getParameter().get(0)));
 			out.print("=");
 			out.print(this.getLocal(accessible, i.getParameter().get(1)));

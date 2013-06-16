@@ -111,18 +111,26 @@ public class JsWriterModule extends JsWriterObject{
 
 	@Override
 	protected AccessibleObject replacement(AccessibleObject accessible) {
+		AccessibleObject out = accessible;
 		if(!(accessible instanceof Member))return accessible;
 		Class<?> clazz = ((Member)accessible).getDeclaringClass();
 		clazz = replacements.containsKey(clazz) ? replacements.get(clazz) : clazz;
 		if(accessible instanceof Method){
 			Method m = ((Method)accessible);
 			try {
-				return clazz.getMethod(m.getName(), m.getParameterTypes());
+				out = clazz.getMethod(m.getName(), m.getParameterTypes());
 			} catch (Exception e) {
 			}
 		}
+		Js a = accessible.getAnnotation(Js.class);
+		if(out instanceof Member){
+			a = ((Member)out).getDeclaringClass().getAnnotation(Js.class);
+		}
+		if(a == null){
+			throw new RuntimeException("Missing @Js  "+out);
+		}
 		
-		return accessible;
+		return out;
 	}
 	
 	@Override

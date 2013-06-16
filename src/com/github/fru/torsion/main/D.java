@@ -6,19 +6,22 @@ import com.github.fru.torsion.javascript.JsNative;
 @Js(global=true)
 public abstract class D {
 
+	@Js
+	public void main(){
+		alert(first());
+		String s = "test";
+		alert(s);
+	}
+	
 	protected int first(){
-		int i = 5;
+		int i = 4;
+		if(i > 2){
+			String s = "z";
+			alert(s);
+		}
 		return 1 + i;
 	}
 	
 	@JsNative(inline = "alert(@3);")
 	protected abstract void alert(Object object);
-	
-	@Js
-	public void run(){
-		int i = 0;
-		while(i++ < 4){
-			alert(5+6);
-		}
-	}
 }
