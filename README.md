@@ -20,4 +20,17 @@ public abstract class HelloWorld {
 
 ```
 
+To generate result files and run them one needs to register the new HelloWorld Java class:
+```
+public static void main(String... args) throws IOException{
+	File html = Generator.generateSimpleFiles(HelloWorld.class);
+	Desktop.getDesktop().browse(html.toURI());
+}
+```
 
+
+
+A more complex example reveals, that basic types can be used as well as functional pointers:
+```
+
+```
