@@ -9,7 +9,7 @@ For anybody still interested a first result, demonstrating a hello world alert b
 @Js(global=true)
 public abstract class HelloWorld {
 
-  @Js(action="load")
+	@Js(action="load")
 	public void first(){
 		alert("Hello World.");
 	}
