@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="description" content="torsion: java javascript crosscompiler">
+
+		<link rel="stylesheet" type="text/css" media="screen" href="stylesheet.css">
+
+		<title>Torsion</title>
+	</head>
+	<body>
+		<!-- HEADER -->
+		<div id="header_wrap" class="outer">
+			<header class="inner">
+				<div class="header-image">
+					<img src="border.png" > 
+				</div>
+				<a id="forkme_banner" href="https://github.com/fru/torsion">View on GitHub</a>
+				<h1 id="project_title">Torsion</h1>
+			</header>
+		</div>
+
+		<!-- MAIN CONTENT -->
+		<div id="main_content_wrap" class="outer">
+			<section id="main_content" class="inner">
+				<p>Generate clientside Javascript from Java. This is a proof of concept for a crosscompiler using 
+				java bytecode. Torsion should not be used for production, for it is in pre-alpha state.</p>
+
+				<p>For anybody still interested a first result, demonstrating a hello world alert box, can be seen below:</p>
+
+<pre><code>@Js(global=true)
+public abstract class HelloWorld {
+
+    @Js(action="load")
+    public void first(){
+        alert("Hello World.");
+    }
+
+    @JsNative(inline = "alert(@3);")
+    protected abstract void alert(Object object);
+}</code></pre>
+
+				<p>To generate result files and run them one needs to register the new HelloWorld Java class:</p>
+
+<pre><code>public static void main(String... args) throws IOException{
+    File html = Generator.generateSimpleFiles(HelloWorld.class);
+    Desktop.getDesktop().browse(html.toURI());
+}</code></pre>
+
+				<p>A more complex example reveals, that basic types can be used as well as functional pointers:</p>
+
+<pre><code>@Js(global=true)
+public abstract class Complex {
+
+    @Js(action="load")
+    public void first(){
+        String i = inc(13)+"";
+
+        alert("test"+i);
+        new Action.Arg0("func").call();
+    }
+
+    @Js(name="func")
+    protected void func(){
+        alert("1233");
+    }
+
+    @JsNative(inline = "alert(@3);")
+    protected abstract void alert(Object object);
+
+    public int inc(int x){
+        return x + 1;
+    }
+}</code></pre>
+
+				<p>View the source <a href="http://github.com/fru/torsion">HERE</a>.</p>
+				
+			</section>
+		</div>
+
+		<!-- FOOTER  -->
+		<div id="footer_wrap" class="outer">
+		  <footer class="inner">
+			<p class="copyright">Torsion maintained by <a href="https://github.com/fru">Florian Rüberg</a></p>
+		  </footer>
+		</div>
+	</body>
+</html>
